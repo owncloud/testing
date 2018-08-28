@@ -1,0 +1,47 @@
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+branches:
+  - master
+
+pipeline:
+  prepare-lint:
+    image: owncloudci/php
+    pull: true
+    commands:
+      - make vendor-bin/php-parallel-lint/vendor
+
+  lint-php5:
+    image: owncloudci/php:5.6
+    pull: true
+    group: lint
+    commands:
+      - make test-php-lint
+
+  lint-php70:
+    image: owncloudci/php:7.0
+    pull: true
+    group: lint
+    commands:
+      - make test-php-lint
+
+  lint-php71:
+    image: owncloudci/php:7.1
+    pull: true
+    group: lint
+    commands:
+      - make test-php-lint
+
+  lint-php72:
+    image: owncloudci/php:7.2
+    pull: true
+    group: lint
+    commands:
+      - make test-php-lint
+
+  build:
+    image: owncloudci/php:7.1
+    pull: true
+    commands:
+      - make dist
