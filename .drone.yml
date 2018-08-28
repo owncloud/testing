@@ -45,3 +45,14 @@ pipeline:
     pull: true
     commands:
       - make dist
+
+  github_release:
+    image: plugins/github-release
+    pull: true
+    secrets: [ github_token ]
+    files: build/dist/testing.tar.gz
+    prerelease: true
+    file_exists: overwrite
+    checksum: sha256
+    when:
+      event: tag
