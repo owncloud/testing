@@ -52,7 +52,7 @@ class Occ {
 	 */
 	public function execute() {
 		$command = $this->request->getParam("command", "");
-		$args = \preg_split("/[\s,]+/", $command);
+		$args = \preg_split("/[\s]+/", $command);
 		$args = \array_map(
 			function ($arg) {
 				return \escapeshellarg($arg);
