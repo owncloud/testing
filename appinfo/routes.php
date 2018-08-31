@@ -28,6 +28,7 @@ use OCA\Testing\Occ;
 use OCA\Testing\Notifications;
 use OCP\API;
 use OCA\Testing\Opcache;
+use OCA\Testing\Logfile;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -144,4 +145,30 @@ $notifications = new Notifications(
 	'/apps/testing/api/v1/notifications',
 	[$notifications, 'addNotification'],
 	'notifications'
+);
+
+$logFile = new Logfile();
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/logfile',
+	[$logFile, 'read'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/logfile/{lines}',
+	[$logFile, 'read'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'delete',
+	'/apps/testing/api/v1/logfile',
+	[$logFile, 'clear'],
+	'testing',
+	API::ADMIN_AUTH
 );
