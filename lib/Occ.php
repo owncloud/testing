@@ -52,6 +52,8 @@ class Occ {
 	 */
 	public function execute() {
 		$command = $this->request->getParam("command", "");
+		$envVariables = $this->request->getParam("env_variables", []);
+
 		$args = \preg_split("/[\s]+/", $command);
 		$args = \array_map(
 			function ($arg) {
@@ -65,11 +67,13 @@ class Occ {
 			1 => ['pipe', 'w'],
 			2 => ['pipe', 'w'],
 		];
+
 		$process = \proc_open(
 			'php console.php ' . $args,
 			$descriptor,
 			$pipes,
-			\realpath("../")
+			\realpath("../"),
+			$envVariables
 		);
 		$lastStdOut = \stream_get_contents($pipes[1]);
 		$lastStdErr = \stream_get_contents($pipes[2]);
@@ -79,9 +83,9 @@ class Occ {
 			"stdOut" => $lastStdOut,
 			"stdErr" => $lastStdErr
 		];
-		
+
 		$resultCode = $lastCode + 100;
-		
+
 		return new Result($result, $resultCode);
 	}
 }
