@@ -26,6 +26,8 @@ use OCA\Testing\Config;
 use OCA\Testing\Locking\Provisioning;
 use OCA\Testing\Occ;
 use OCA\Testing\Notifications;
+use OCA\Testing\ServerFiles;
+use OCA\Testing\SysInfo;
 use OCP\API;
 use OCA\Testing\Opcache;
 use OCA\Testing\Logfile;
@@ -169,6 +171,36 @@ API::register(
 	'delete',
 	'/apps/testing/api/v1/logfile',
 	[$logFile, 'clear'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$sysInfo = new SysInfo();
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/sysinfo',
+	[$sysInfo, 'read'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$serverFiles = new ServerFiles(
+	\OC::$server->getRequest()
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/dir',
+	[$serverFiles, 'mkDir'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/file',
+	[$serverFiles, 'createFile'],
 	'testing',
 	API::ADMIN_AUTH
 );
