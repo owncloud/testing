@@ -52,7 +52,8 @@ class Occ {
 	 */
 	public function execute() {
 		$command = $this->request->getParam("command", "");
-		$envVariables = $this->request->getParam("env_variables", []);
+		$reqEnvVars = $this->request->getParam("env_variables", []);
+		$envVars = array_merge($this->getDefaultEnv(), $reqEnvVars);
 
 		$args = \preg_split("/[\s]+/", $command);
 		$args = \array_map(
@@ -73,7 +74,7 @@ class Occ {
 			$descriptor,
 			$pipes,
 			\realpath("../"),
-			$envVariables
+			$envVars
 		);
 		$lastStdOut = \stream_get_contents($pipes[1]);
 		$lastStdErr = \stream_get_contents($pipes[2]);
@@ -87,5 +88,22 @@ class Occ {
 		$resultCode = $lastCode + 100;
 
 		return new Result($result, $resultCode);
+	}
+
+	// Taken from https://github.com/symfony/process/blob/master/Process.php
+	private function getDefaultEnv()
+	{
+		$env = array();
+		foreach ($_SERVER as $k => $v) {
+			if (\is_string($v) && false !== $v = getenv($k)) {
+				$env[$k] = $v;
+			}
+		}
+		foreach ($_ENV as $k => $v) {
+			if (\is_string($v)) {
+				$env[$k] = $v;
+			}
+		}
+		return $env;
 	}
 }
