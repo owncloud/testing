@@ -40,6 +40,12 @@ pipeline:
     commands:
       - make test-php-lint
 
+  owncloud-coding-standard:
+    image: owncloudci/php:7.1
+    pull: true
+    commands:
+      - make test-php-style
+
   build:
     image: owncloudci/php:7.1
     pull: true
