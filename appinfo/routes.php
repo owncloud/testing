@@ -31,6 +31,7 @@ use OCA\Testing\SysInfo;
 use OCP\API;
 use OCA\Testing\Opcache;
 use OCA\Testing\Logfile;
+use OCA\Testing\DavSlowdown;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -201,6 +202,16 @@ API::register(
 	'post',
 	'/apps/testing/api/v1/file',
 	[$serverFiles, 'createFile'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$davSlowDown = new DavSlowdown();
+
+API::register(
+	'put',
+	'/apps/testing/api/v1/davslowdown/{method}/{seconds}',
+	[$davSlowDown, 'setSlowdown'],
 	'testing',
 	API::ADMIN_AUTH
 );
