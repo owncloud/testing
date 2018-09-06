@@ -11,7 +11,7 @@ You can install the app via git in your app-folder
 
 ```
 cd apps
-git clone  https://github.com/owncloud/testing.git
+git clone https://github.com/owncloud/testing.git
 php occ app:enable testing
 ```
 
@@ -20,5 +20,16 @@ php occ app:enable testing
 
 The latest published version can be found at https://github.com/owncloud/testing/releases/tag/latest
 
-In order to update the latest version to be available, we need to move the github tag to a new HEAD.
-Once the tag `latest` is pushed to github, drone-ci will build and publish the app to github
+In order to update the latest version to be available, we need to move the git tag to a new HEAD.
+In a local clone of this repository, move the tag by:
+
+```
+git fetch origin
+git checkout master
+git pull
+git tag --force latest HEAD
+git push --force --tags
+```
+
+
+Once the tag `latest` is pushed to github, drone-ci will build and publish the app to github.
