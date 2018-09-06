@@ -53,7 +53,7 @@ class Occ {
 	public function execute() {
 		$command = $this->request->getParam("command", "");
 		$reqEnvVars = $this->request->getParam("env_variables", []);
-		$envVars = array_merge($this->getDefaultEnv(), $reqEnvVars);
+		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
 
 		$args = \preg_split("/[\s]+/", $command);
 		$args = \array_map(
@@ -91,11 +91,10 @@ class Occ {
 	}
 
 	// Taken from https://github.com/symfony/process/blob/master/Process.php
-	private function getDefaultEnv()
-	{
-		$env = array();
+	private function getDefaultEnv() {
+		$env = [];
 		foreach ($_SERVER as $k => $v) {
-			if (\is_string($v) && false !== $v = getenv($k)) {
+			if (\is_string($v) && false !== $v = \getenv($k)) {
 				$env[$k] = $v;
 			}
 		}
