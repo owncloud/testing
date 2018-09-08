@@ -32,6 +32,13 @@ use OCP\IRequest;
  */
 class Occ {
 
+	// Variables defined in CI environments to pass automatically on
+	// to subshells when using remoteocc
+	const TESTING_ENV_VARS = [
+		'CI',
+		'PATH',
+	];
+
 	/**
 	 *
 	 * @var IRequest
@@ -101,6 +108,11 @@ class Occ {
 		foreach ($_ENV as $k => $v) {
 			if (\is_string($v)) {
 				$env[$k] = $v;
+			}
+		}
+		foreach (self::TESTING_ENV_VARS as $k) {
+			if (\getenv($k)) {
+				$env[$k] = \getenv($k);
 			}
 		}
 		return $env;
