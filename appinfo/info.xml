@@ -10,6 +10,12 @@
 		<owncloud min-version="10.0" max-version="10.1" />
 	</dependencies>
 	<types>
+		<dav/>
 		<authentication/>
 	</types>
+	<sabre>
+		<plugins>
+			<plugin>OCA\Testing\Dav\SlowdownPlugin</plugin>
+		</plugins>
+	</sabre>
 </info>
