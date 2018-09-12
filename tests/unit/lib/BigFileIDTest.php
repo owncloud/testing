@@ -2,7 +2,6 @@
 
 namespace OCA\Testing\Tests\Unit\Lib;
 
-
 use OCA\Testing\BigFileID;
 use OCP\ILogger;
 use Test\TestCase;
