@@ -6,6 +6,25 @@ branches:
   - master
 
 pipeline:
+  install-server:
+    image: owncloudci/core
+    pull: true
+    exclude:
+    - apps/testing
+    version: daily-stable10-qa
+
+  install-app:
+    image: owncloudci/php
+    pull: true
+    environment:
+    - COMPOSER_HOME=/var/www/owncloud/apps/testing/.cache/composer
+    commands:
+    - make vendor
+    - cd /var/www/owncloud/
+    - php occ a:l
+    - php occ a:e testing
+    - php occ a:l
+
   prepare-lint:
     image: owncloudci/php
     pull: true
@@ -45,6 +64,12 @@ pipeline:
     pull: true
     commands:
       - make test-php-style
+
+  phpunit-unit-tests:
+    image: owncloudci/php
+    pull: true
+    commands:
+    - make test-php-unit-dbg
 
   build:
     image: owncloudci/php:7.1
