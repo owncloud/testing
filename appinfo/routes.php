@@ -215,9 +215,25 @@ API::register(
 );
 
 API::register(
+	'delete',
+	'/apps/testing/api/v1/dir',
+	[$serverFiles, 'rmDir'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
 	'post',
 	'/apps/testing/api/v1/file',
 	[$serverFiles, 'createFile'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'delete',
+	'/apps/testing/api/v1/file',
+	[$serverFiles, 'deleteFile'],
 	'testing',
 	API::ADMIN_AUTH
 );

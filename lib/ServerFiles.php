@@ -21,9 +21,12 @@
 
 namespace OCA\Testing;
 
+use FilesystemIterator;
 use OC\OCS\Result;
 use OCP\IConfig;
 use OCP\IRequest;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  *
@@ -67,6 +70,42 @@ class ServerFiles {
 	}
 
 	/**
+	 * Delete the specified directory under the server root
+	 *
+	 * 'dir' is the directory to delete, which may be inside other directories
+	 * e.g. 'apps2/myapp/appinfo'
+	 *
+	 * @return Result
+	 */
+	public function rmDir() {
+		$dir = \trim($this->request->getParam('dir'), '/');
+		if ($dir === "") {
+			return new Result(null, 400, "cannot delete dir, no dir name given");
+		}
+		$targetDir = \OC::$SERVERROOT . "/$dir";
+		if (\file_exists($targetDir)) {
+			if (\is_dir($targetDir)) {
+				$di = new RecursiveDirectoryIterator(
+					$targetDir, FilesystemIterator::SKIP_DOTS
+				);
+				$ri = new RecursiveIteratorIterator(
+					$di, RecursiveIteratorIterator::CHILD_FIRST
+				);
+				foreach ($ri as $file) {
+					$file->isDir() ?  \rmdir($file) : \unlink($file);
+				}
+				\rmdir($targetDir);
+			} else {
+				return new Result(null, 400, "$dir is not a directory");
+			}
+		} else {
+			return new Result(null, 400, "$dir does not exist");
+		}
+
+		return new Result();
+	}
+
+	/**
 	 * Create the specified file under the server root
 	 *
 	 * 'file' is the file to create, including path from the server root
@@ -80,6 +119,33 @@ class ServerFiles {
 		$content = $this->request->getParam('content');
 		$targetFile = \OC::$SERVERROOT . "/$filePath";
 		\file_put_contents($targetFile, $content);
+
+		return new Result();
+	}
+
+	/**
+	 * Delete the specified file under the server root
+	 *
+	 * 'file' is the file to delete, including path from the server root
+	 * e.g. 'apps2/myapp/appinfo/info.xml'
+	 *
+	 * @return Result
+	 */
+	public function deleteFile() {
+		$filePath = \trim($this->request->getParam('file'), '/');
+		if ($filePath === "") {
+			return new Result(null, 400, "cannot delete file, no file name given");
+		}
+		$targetFile = \OC::$SERVERROOT . "/$filePath";
+		if (\file_exists($targetFile)) {
+			if (\is_dir($targetFile)) {
+				return new Result(null, 403, "$filePath is a directory");
+			} else {
+				\unlink($targetFile);
+			}
+		} else {
+			return new Result(null, 400, "$filePath does not exist");
+		}
 
 		return new Result();
 	}
