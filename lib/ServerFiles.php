@@ -92,9 +92,28 @@ class ServerFiles {
 					$di, RecursiveIteratorIterator::CHILD_FIRST
 				);
 				foreach ($ri as $file) {
-					$file->isDir() ?  \rmdir($file) : \unlink($file);
+					if ($file->isDir()) {
+						if (!\rmdir($file)) {
+							return new Result(
+								null,
+								400,
+								"failed to delete sub-directory $file while deleting $targetDir");
+						}
+					} else {
+						if (!\unlink($file)) {
+							return new Result(
+								null,
+								400,
+								"failed to delete file $file while deleting $targetDir");
+						}
+					}
 				}
-				\rmdir($targetDir);
+				if (!\rmdir($targetDir)) {
+					return new Result(
+						null,
+						400,
+						"failed to delete directory $targetDir");
+				}
 			} else {
 				return new Result(null, 400, "$dir is not a directory");
 			}
@@ -141,7 +160,9 @@ class ServerFiles {
 			if (\is_dir($targetFile)) {
 				return new Result(null, 403, "$filePath is a directory");
 			} else {
-				\unlink($targetFile);
+				if (!\unlink($targetFile)) {
+					return new Result(null, 400, "failed to delete $filePath");
+				}
 			}
 		} else {
 			return new Result(null, 400, "$filePath does not exist");
