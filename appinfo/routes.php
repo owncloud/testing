@@ -55,6 +55,14 @@ API::register(
 );
 
 API::register(
+	'get',
+	'/apps/testing/api/v1/app/{appid}/{configkey}',
+	[$config, 'getAppValue'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
 	'post',
 	'/apps/testing/api/v1/apps',
 	[$config, 'setAppValues'],
@@ -66,6 +74,14 @@ API::register(
 	'delete',
 	'/apps/testing/api/v1/apps',
 	[$config, 'deleteAppValues'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/app/{appid}',
+	[$config, 'getAppValues'],
 	'testing',
 	API::ADMIN_AUTH
 );

@@ -22,6 +22,7 @@
 namespace OCA\Testing;
 
 use OCP\IConfig;
+use OC\OCS\Result;
 use OCP\IRequest;
 
 class Config {
@@ -69,6 +70,23 @@ class Config {
 	}
 
 	/**
+	 * @param array $parameters
+	 * @return Result
+	 */
+	public function getAppValue($parameters) {
+		$appid = $parameters['appid'];
+		$configKey = $parameters['configkey'];
+		
+		$value = $this->config->getAppValue($appid, $configKey);
+		$result[] = [
+			'configkey' => $configKey,
+			'value' => $value,
+			'appid' => $appid
+		];
+		return new Result($result);
+	}
+
+	/**
 	 * @return \OC_OCS_Result
 	 */
 	public function setAppValues() {
@@ -93,7 +111,6 @@ class Config {
 	 */
 	public function deleteAppValues() {
 		$values = $this->request->getParam('values');
-
 		if (\is_array($values)) {
 			foreach ($values as $appEntry) {
 				if (\is_array($appEntry)) {
@@ -106,5 +123,31 @@ class Config {
 		}
 
 		return new \OC_OCS_Result();
+	}
+
+	/**
+	 * @param array $parameters
+	 *
+	 * @return Result
+	 */
+	public function getAppValues($parameters) {
+		$appName = $parameters['appid'];
+		$result = [];
+
+		$appKeys = $this->config->getAppKeys($appName);
+		
+		foreach ($appKeys as $appKey) {
+			$value = $this->config->getAppValue(
+				$appName,
+				$appKey
+			);
+			$result[] = [
+				'configkey' => $appKey,
+				'value' => $value,
+				'appid' => $appName
+			];
+		}
+
+		return new Result($result);
 	}
 }
