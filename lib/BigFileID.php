@@ -21,6 +21,8 @@
 
 namespace OCA\Testing;
 
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Schema\Sequence;
 use OC\OCS\Result;
 use OCP\IDBConnection;
 use OCP\ILogger;
@@ -48,6 +50,15 @@ class BigFileID {
 	 */
 	public function increaseFileIDsBeyondMax32bits() {
 		$this->logger->warning('Inserting dummy entry with fileid bigger than max int of 32 bits for testing');
+
+		if ($this->connection->getDatabasePlatform() instanceof OraclePlatform) {
+			$seq = new Sequence('"*PREFIX*filecache_SEQ"', 1, 2147483647);
+			$dropSql = $this->connection->getDatabasePlatform()->getDropSequenceSQL($seq);
+			$createSql = $this->connection->getDatabasePlatform()->getCreateSequenceSQL($seq);
+
+			$this->connection->executeQuery($dropSql);
+			$this->connection->executeQuery($createSql);
+		}
 
 		$this->connection->insertIfNotExist('*PREFIX*filecache',
 			[
