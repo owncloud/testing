@@ -21,7 +21,11 @@
 
 namespace OCA\Testing;
 
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Schema\Sequence;
+use OC\OCS\Result;
 use OCP\IDBConnection;
+use OCP\ILogger;
 
 /**
  * Class for increasing file ids over 32 bits max int
@@ -30,30 +34,41 @@ class BigFileID {
 
 	/** @var IDBConnection */
 	private $connection;
+	/** @var ILogger */
+	private $logger;
 
-	public function __construct(IDBConnection $connection) {
+	public function __construct(IDBConnection $connection, ILogger $logger) {
 		$this->connection = $connection;
+		$this->logger = $logger;
 	}
 
 	/**
 	 * Put a dummy entry to make the autoincrement go beyond the 32 bits limit
-	 * @return \OC_OCS_Result
+	 *
+	 * @return Result
+	 * @throws \Doctrine\DBAL\DBALException
 	 */
 	public function increaseFileIDsBeyondMax32bits() {
-		\OC::$server->getLogger()->warning('Inserting dummy entry with fileid bigger than max int of 32 bits for testing');
-		$insertedFileID = "'2147483647'";
-		$queryCheckFileID = "SELECT * from oc_filecache where fileid=" . $insertedFileID;
-		$response = $this->connection->executeQuery($queryCheckFileID)->fetchAll();
+		$this->logger->warning('Inserting dummy entry with fileid bigger than max int of 32 bits for testing');
 
-		if (empty($response)) {
-			$query = "INSERT INTO oc_filecache (fileid, storage, path, path_hash, parent,
-												name, mimetype, mimepart, size, mtime, storage_mtime,
-												encrypted, unencrypted_size, etag, permissions, checksum)
-					  VALUES (" . $insertedFileID . ", '10000', 'dummy', '59f91d3e7ebd97ade2e147d2066cc4eb', '5831',
-												'', '4', '3', '163', '1499256550', '1499256550',
-												'0', '0', '595cd6e63f375', '27', 'NULL')";
-			$this->connection->executeQuery($query);
+		if ($this->connection->getDatabasePlatform() instanceof OraclePlatform) {
+			$seq = new Sequence('"*PREFIX*filecache_SEQ"', 1, 2147483647);
+			$dropSql = $this->connection->getDatabasePlatform()->getDropSequenceSQL($seq);
+			$createSql = $this->connection->getDatabasePlatform()->getCreateSequenceSQL($seq);
+
+			$this->connection->executeQuery($dropSql);
+			$this->connection->executeQuery($createSql);
 		}
-		return new \OC_OCS_Result();
+
+		$this->connection->insertIfNotExist('*PREFIX*filecache',
+			[
+				'fileid' => 2147483647, 'storage' => 10000, 'path' => 'dummy',
+				'path_hash' => '59f91d3e7ebd97ade2e147d2066cc4eb', 'parent' => '5831',
+				'name' => '', 'mimetype' => 4, 'mimepart' => 3, 'size' => 163,
+				'mtime' => 1499256550, 'storage_mtime' => 1499256550, 'encrypted' => 0,
+				'unencrypted_size' => 0, 'etag' => '595cd6e63f375', 'permissions' => 27, 'checksum' => null],
+			['fileid']);
+
+		return new Result();
 	}
 }

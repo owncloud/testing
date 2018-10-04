@@ -6,51 +6,76 @@ branches:
   - master
 
 pipeline:
-  prepare-lint:
-    image: owncloudci/php
+  install-server:
+    image: owncloudci/core
     pull: true
-    commands:
-      - make vendor-bin/php-parallel-lint/vendor
+    exclude:
+    - apps/testing
+    version: ${OC_VERSION}
+    db_type: ${DB_TYPE}
+    db_name: ${DB_NAME=owncloud}
+    db_host: ${DB_TYPE}
+    db_username: autotest
+    db_password: owncloud
+    when:
+      matrix:
+        NEED_SERVER: true
 
-  lint-php5:
-    image: owncloudci/php:5.6
+  install-app:
+    image: owncloudci/php:${PHP_VERSION}
     pull: true
-    group: lint
+    environment:
+    - COMPOSER_HOME=/var/www/owncloud/apps/testing/.cache/composer
     commands:
-      - make test-php-lint
+    - make vendor
+    - cd /var/www/owncloud/
+    - php occ a:l
+    - php occ a:e testing
+    - php occ a:l
+    when:
+      matrix:
+        NEED_INSTALL_APP: true
 
-  lint-php70:
-    image: owncloudci/php:7.0
+  owncloud-lint:
+    image: owncloudci/php:${PHP_VERSION}
     pull: true
-    group: lint
     commands:
-      - make test-php-lint
-
-  lint-php71:
-    image: owncloudci/php:7.1
-    pull: true
-    group: lint
-    commands:
-      - make test-php-lint
-
-  lint-php72:
-    image: owncloudci/php:7.2
-    pull: true
-    group: lint
-    commands:
-      - make test-php-lint
+    - make vendor-bin/php-parallel-lint/vendor
+    - make test-php-lint
+    when:
+      matrix:
+        TEST_SUITE: owncloud-coding-standard
 
   owncloud-coding-standard:
-    image: owncloudci/php:7.1
+    image: owncloudci/php:${PHP_VERSION}
     pull: true
     commands:
       - make test-php-style
+    when:
+      matrix:
+        TEST_SUITE: owncloud-coding-standard
+
+  phpunit-tests:
+    image: owncloudci/php:${PHP_VERSION}
+    pull: true
+    environment:
+    - PHP_VERSION=${PHP_VERSION}
+    - COVERAGE=${COVERAGE}
+    commands:
+    - if [ -z "${COVERAGE}" ]; then make test-php-unit; fi
+    - if [ "${COVERAGE}" = "true" ]; then make test-php-unit-dbg; fi
+    when:
+      matrix:
+        TEST_SUITE: phpunit
 
   build:
-    image: owncloudci/php:7.1
+    image: owncloudci/php:${PHP_VERSION}
     pull: true
     commands:
       - make dist
+    when:
+      matrix:
+        TEST_SUITE: build
 
   github_release:
     image: plugins/github-release
@@ -62,3 +87,135 @@ pipeline:
     checksum: sha256
     when:
       event: tag
+      matrix:
+        TEST_SUITE: build
+
+services:
+  mysql:
+    image: mysql:5.5
+    environment:
+    - MYSQL_USER=autotest
+    - MYSQL_PASSWORD=owncloud
+    - MYSQL_DATABASE=${DB_NAME=owncloud}
+    - MYSQL_ROOT_PASSWORD=owncloud
+    when:
+      matrix:
+        DB_TYPE: mysql
+
+  pgsql:
+    image: postgres:9.4
+    environment:
+    - POSTGRES_USER=autotest
+    - POSTGRES_PASSWORD=owncloud
+    - POSTGRES_DB=${DB_NAME=owncloud}
+    when:
+      matrix:
+        DB_TYPE: pgsql
+
+  oci:
+    image: deepdiver/docker-oracle-xe-11g
+    environment:
+    - ORACLE_USER=system
+    - ORACLE_PASSWORD=oracle
+    - ORACLE_DB=${DB_NAME=owncloud}
+    when:
+      matrix:
+        DB_TYPE: oci
+
+matrix:
+  include:
+  # owncloud-coding-standard
+  - PHP_VERSION: 7.2
+    TEST_SUITE: owncloud-coding-standard
+
+  # build
+  - PHP_VERSION: 7.2
+    TEST_SUITE: build
+
+  # Unit Tests
+  - PHP_VERSION: 7.1
+    OC_VERSION: daily-master-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: sqlite
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.1
+    OC_VERSION: daily-master-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.1
+    OC_VERSION: daily-master-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: pgsql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.1
+    OC_VERSION: daily-master-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: oci
+    DB_NAME: XE
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.2
+    OC_VERSION: daily-master-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 5.6
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: sqlite
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 5.6
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.0
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.0
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: pgsql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+    COVERAGE: true
+
+  - PHP_VERSION: 7.0
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: oci
+    DB_NAME: XE
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.1
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true
+
+  - PHP_VERSION: 7.2
+    OC_VERSION: daily-stable10-qa
+    TEST_SUITE: phpunit
+    DB_TYPE: mysql
+    NEED_SERVER: true
+    NEED_INSTALL_APP: true

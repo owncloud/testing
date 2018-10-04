@@ -117,7 +117,8 @@ API::register(
 );
 
 $bigFileID = new BigFileID(
-	\OC::$server->getDatabaseConnection()
+	\OC::$server->getDatabaseConnection(),
+	\OC::$server->getLogger()
 );
 
 API::register(
