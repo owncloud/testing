@@ -62,7 +62,17 @@ class Occ {
 		$reqEnvVars = $this->request->getParam("env_variables", []);
 		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
 
-		$args = \preg_split("/[\s]+/", $command);
+		// Match the pieces of the string that are like:
+		//   Strings with single-quoted parts and there could be space(s) in the
+		//   single-quoted parts:
+		//     --display-name='User One'
+		//     --email='user1@example.org'
+		//   Simple strings like:
+		//     user:add
+		//     user1
+		//     --password-from-env
+		\preg_match_all("/\S*?'[^']*?'|\S+/", $command, $matches);
+		$args = $matches[0];
 		$args = \array_map(
 			function ($arg) {
 				return \escapeshellarg($arg);
