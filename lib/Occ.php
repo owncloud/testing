@@ -67,6 +67,9 @@ class Occ {
 		//   single-quoted parts:
 		//     --display-name='User One'
 		//     --email='user1@example.org'
+		//     'An already quoted literal value with spaces in it'
+		//     ' '
+		//     ''
 		//   Simple strings like:
 		//     user:add
 		//     user1
@@ -75,7 +78,11 @@ class Occ {
 		$args = $matches[0];
 		$args = \array_map(
 			function ($arg) {
-				if ((\substr($arg, 0, 1) === "'") && (\substr($arg, -1) === "'")) {
+				// if the arg is already surrounded by single-quotes or the arg looks like:
+				//   something='abc'
+				// then do not use escapeshellarg on it.
+				if (((\substr($arg, 0, 1) === "'") || \strpos($arg, "='", 1) !== false)
+					&& (\substr($arg, -1) === "'")) {
 					return $arg;
 				}
 				return \escapeshellarg($arg);
