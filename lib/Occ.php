@@ -75,6 +75,9 @@ class Occ {
 		$args = $matches[0];
 		$args = \array_map(
 			function ($arg) {
+				if ((\substr($arg, 0, 1) === "'") && (\substr($arg, -1) === "'")) {
+					return $arg;
+				}
 				return \escapeshellarg($arg);
 			}, $args
 		);
