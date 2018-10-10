@@ -75,6 +75,11 @@ test-php-style-fix:        ## Run php-cs-fixer and fix code style issues
 test-php-style-fix: vendor-bin/owncloud-codestyle/vendor
 	$(PHP_CS_FIXER) fix -v --diff --diff-format udiff --allow-risky yes
 
+.PHONY: test-acceptance-api
+test-acceptance-api:        ## Run php-cs-fixer and fix code style issues
+test-acceptance-api: vendor
+	../../tests/acceptance/run.sh --config tests/acceptance/config/behat.yml --type api
+
 #
 # Dependency management
 #--------------------------------------
