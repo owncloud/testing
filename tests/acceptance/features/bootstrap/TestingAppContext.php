@@ -98,6 +98,19 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @Then the response should contain the server root
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheServerRoot() {
+		$responseXml = $this->featureContext->getResponseXml();
+		$data = \json_decode(\json_encode($responseXml->data[0]), 1);
+
+		PHPUnit_Framework_Assert::assertInternalType('string', $data['server_root']);
+		PHPUnit_Framework_Assert::assertRegExp('/[^\0]+/', $data['server_root']);
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
