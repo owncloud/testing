@@ -77,6 +77,27 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator requests the logfile with :number lines using the testing API
+	 *
+	 * @param int $number
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRequestsTheLogfileWithLinesUsingTheTestingApi($number) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/logfile/{$number}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
