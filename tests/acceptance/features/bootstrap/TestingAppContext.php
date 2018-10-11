@@ -58,6 +58,45 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * Returns a list of config keys for the given app
+	 *
+	 * @param string $appID
+	 *
+	 * @return array
+	 */
+	public function getConfigKeyList($appID) {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/app/{$appID}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$configkeyValues = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data), 1)['element'];
+		return $configkeyValues;
+	}
+
+	/**
+	 * Check if given config key is present for given app
+	 *
+	 * @param string $key
+	 * @param string $appID
+	 *
+	 * @return bool
+	 */
+	public function checkConfigKeyInApp($key, $appID) {
+		$configkeyList = $this->getConfigKeyList($appID);
+		foreach ($configkeyList as $config) {
+			if ($config['configkey'] === $key) {
+				return  true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	* @When the administrator requests the system-info using the testing API
 	 *
 	 * @return void
@@ -98,6 +137,74 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator adds a config key :key with value :value in app :appID using the testing API
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param string $appID
+	 *
+	 * @return void
+	 */
+	public function theAdministratorAddsAConfigKeyWithValueInAppUsingTheTestingApi($key, $value, $appID) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/app/{$appID}/{$key}"),
+			["value" => $value],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the config key :key of app :appID must have value :value
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param string $appID
+	 *
+	 * @return void
+	 */
+	public function theConfigKeyOfAppMustHaveValue($key, $appID, $value) {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/app/{$appID}/{$key}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$configkeyValue = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data[0]->element->value), 1)[0];
+		PHPUnit_Framework_Assert::assertEquals($value, $configkeyValue);
+	}
+
+	/**
+	 * @When the administrator deletes the config key :key in app :appID using the testing API
+	 *
+	 * @param string $key
+	 * @param string $appID
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheConfigKeyInAppUsingTheTestingApi($key, $appID) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/app/{$appID}/{$key}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then the response should contain the server root
 	 *
 	 * @return void
@@ -108,6 +215,28 @@ class TestingAppContext implements Context {
 
 		PHPUnit_Framework_Assert::assertInternalType('string', $data['server_root']);
 		PHPUnit_Framework_Assert::assertRegExp('/[^\0]+/', $data['server_root']);
+	}
+
+	/**
+	 * @Then /^the app ((?:'[^']*')|(?:"[^"]*")) should (not|)\s?have config key ((?:'[^']*')|(?:"[^"]*"))$/
+	 *
+	 * @param string $appID
+	 * @param string $shouldOrNot
+	 * @param string $key
+	 *
+	 * @return void
+	 */
+	public function theAppShouldHaveConfigKey($appID, $shouldOrNot, $key) {
+		$appID = \trim($appID, $appID[0]);
+		$key = \trim($key, $key[0]);
+
+		$should = ($shouldOrNot !== "not");
+
+		if ($should) {
+			PHPUnit_Framework_Assert::assertTrue($this->checkConfigKeyInApp($key, $appID));
+		} else {
+			PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($key, $appID));
+		}
 	}
 
 	/**

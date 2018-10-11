@@ -24,3 +24,21 @@ Feature: Testing the testing app
       | ocs-api-version | line-number | ocs-status | http-status | http-reason-phrase |
       | 1               | 1          | 100        | 200         | OK                 |
       | 2               | 2          | 200        | 200         | OK                 |
+
+  Scenario Outline: Admin adds and deletes config key in a app
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator adds a config key "con" with value "conkey" in app "core" using the testing API
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the app "core" should have config key "con"
+    And the config key "con" of app "core" must have value "conkey"
+    When the administrator deletes the config key "con" in app "core" using the testing API
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the app "core" should not have config key "con"
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
