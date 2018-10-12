@@ -156,6 +156,27 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/logfile/{$number}"),
 			[],
 			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator requests the details about the app :appId
+	 *
+	 * @param int $number
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRequestsTheDetailsAboutTheApp($appId) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/app/{$appId}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -343,6 +364,75 @@ class TestingAppContext implements Context {
 			foreach ($table as $item) {
 				PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($item['configkey'], $item['appid']));
 			}
+		}
+	}
+
+	/**
+	 * @Then the response should contain the installed version of the app
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
+		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+
+		foreach ($data as $element) {
+			if ($element['configkey'] == 'installed_version') {
+				$version = $element['value'];
+				$appName = $element['appid'];
+				break;
+			}
+		}
+
+		if (isset($appName, $version)) {
+			$this->featureContext->invokingTheCommand(
+				"config:list $appName"
+			);
+			$lastOutput = $this->featureContext->getStdOutOfOccCommand();
+			$lastOutputArray = \json_decode($lastOutput, true);
+			$app_version = $lastOutputArray['apps'][$appName]['installed_version'];
+
+			PHPUnit_Framework_Assert::assertSame($app_version, $version);
+		} else {
+			throw new \Exception("Version info could not be found in the response.");
+		}
+	}
+
+	/**
+	 * @Then the response should have the name of the app :appID
+	 *
+	 * @param string $appID
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldHaveTheNameOfTheApp($appID) {
+		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+		foreach ($data as $element) {
+			$responseAppName = $element['appid'];
+			PHPUnit_Framework_Assert::assertSame($appID, $responseAppName);
+		}
+	}
+
+	/**
+	 * @Then the response should have the app enabled status of app
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldHaveTheAppEnabledStatusOfApp() {
+		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+		foreach ($data as $element) {
+			if ($element['configkey'] == 'enabled') {
+				$appEnabled = $element['value'];
+				$appName = $element['appid'];
+				break;
+			}
+		}
+		if (isset($appName, $appEnabled)) {
+			$lastOutput = $this->featureContext->getStdOutOfOccCommand();
+			$lastOutputArray = \json_decode($lastOutput, true);
+			$actualAppEnabledStatus = $lastOutputArray['apps'][$appName]['enabled'];
+			PHPUnit_Framework_Assert::assertSame($appEnabled, $actualAppEnabledStatus);
+		} else {
+			throw new \Exception("App enabled status could not be found in the response.");
 		}
 	}
 
