@@ -267,10 +267,9 @@ class TestingAppContext implements Context {
 	 */
 	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
 		$responseXml = $this->featureContext->getResponseXml();
+		\var_dump($responseXml);
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1)['element'];
-		if (!isset($data[0])) {
-			$data[0] = $data;
-		}
+
 		foreach ($data as $element) {
 			if ($element['configkey'] == 'installed_version') {
 				$version = $element['value'];
@@ -303,9 +302,7 @@ class TestingAppContext implements Context {
 	public function theResponseShouldHaveTheNameOfTheApp($appID) {
 		$responseXml = $this->featureContext->getResponseXml();
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1)['element'];
-		if (!isset($data[0])) {
-			$data[0] = $data;
-		}
+
 		foreach ($data as $element) {
 			$responseAppName = $element['appid'];
 			PHPUnit_Framework_Assert::assertSame($appID, $responseAppName);
@@ -320,9 +317,7 @@ class TestingAppContext implements Context {
 	public function theResponseShouldHaveTheAppEnabledStatusOfApp() {
 		$responseXml = $this->featureContext->getResponseXml();
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1)['element'];
-		if (!isset($data[0])) {
-			$data[0] = $data;
-		}
+
 		foreach ($data as $element) {
 			if ($element['configkey'] == 'enabled') {
 				$appEnabled = $element['value'];
