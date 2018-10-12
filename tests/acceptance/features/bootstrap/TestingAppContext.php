@@ -75,7 +75,19 @@ class TestingAppContext implements Context {
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
-		$configkeyValues = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data), 1)['element'];
+		$configkeyData = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data), 1);
+		if (isset($configkeyData['element'])) {
+			$configkeyData = $configkeyData['element'];
+		} else {
+			// There are no keys for the app
+			return [];
+		}
+		if (isset($configkeyData[0])) {
+			$configkeyValues = $configkeyData;
+		} else {
+			// There is just 1 key for the app
+			$configkeyValues[0] = $configkeyData;
+		}
 		return $configkeyValues;
 	}
 
