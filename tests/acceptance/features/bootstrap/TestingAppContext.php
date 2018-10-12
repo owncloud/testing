@@ -267,7 +267,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
 		$responseXml = $this->featureContext->getResponseXml();
-		\var_dump($responseXml);
+		\var_dump(\json_decode(\json_encode($responseXml->data[0]), 1));
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1)['element'];
 
 		foreach ($data as $element) {
