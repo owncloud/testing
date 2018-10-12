@@ -42,3 +42,43 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Admin adds multiple config keys
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator adds these config keys using the testing API
+      | appid           | configkey   | value     |
+      | core            | key1        | value1    |
+      | user_management | key2        | value2    |
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And following config keys should exist
+      | appid           | configkey   |
+      | core            | key1        |
+      | user_management | key2        |
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Admin deletes multiple config keys
+    Given using OCS API version "<ocs-api-version>"
+    And the administrator has added these config keys
+      | appid           | configkey   | value     |
+      | core            | key1        | value1    |
+      | user_management | key2        | value2    |
+    When the administrator deletes these config keys using the testing API
+      | appid           | configkey   |
+      | core            | key1        |
+      | user_management | key2        |
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And following config keys should not exist
+      | appid           | configkey   |
+      | core            | key1        |
+      | user_management | key2        |
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |

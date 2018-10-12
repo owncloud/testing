@@ -24,6 +24,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
 
@@ -74,7 +75,19 @@ class TestingAppContext implements Context {
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
-		$configkeyValues = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data), 1)['element'];
+		$configkeyData = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data), 1);
+		if (isset($configkeyData['element'])) {
+			$configkeyData = $configkeyData['element'];
+		} else {
+			// There are no keys for the app
+			return [];
+		}
+		if (isset($configkeyData[0])) {
+			$configkeyValues = $configkeyData;
+		} else {
+			// There is just 1 key for the app
+			$configkeyValues[0] = $configkeyData;
+		}
 		return $configkeyValues;
 	}
 
@@ -236,6 +249,89 @@ class TestingAppContext implements Context {
 			PHPUnit_Framework_Assert::assertTrue($this->checkConfigKeyInApp($key, $appID));
 		} else {
 			PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($key, $appID));
+		}
+	}
+
+	/**
+	 * @When the administrator adds these config keys using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorAddsTheseConfigKeysUsingTheTestingApi(TableNode $table) {
+		$requestBody = [];
+		foreach ($table as $item) {
+			\array_push($requestBody, $item);
+		}
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/apps"),
+			['values' => $requestBody],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator deletes these config keys using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheseConfigKeysUsingTheTestingApi(TableNode $table) {
+		$requestBody = [];
+		foreach ($table as $item) {
+			\array_push($requestBody, $item);
+		}
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/apps"),
+			['values' => $requestBody],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has added these config keys
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasAddedTheseConfigKeys(TableNode $table) {
+		$this->theAdministratorAddsTheseConfigKeysUsingTheTestingApi($table);
+		PHPUnit_Framework_Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
+	}
+
+	/**
+	 * @Then /^following config keys should (not|)\s?exist$/
+	 *
+	 * @param string $shouldOrNot
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function followingConfigKeysMustExist($shouldOrNot, TableNode $table) {
+		$should = ($shouldOrNot !== "not");
+		if ($should) {
+			foreach ($table as $item) {
+				PHPUnit_Framework_Assert::assertTrue($this->checkConfigKeyInApp($item['configkey'], $item['appid']));
+			}
+		} else {
+			foreach ($table as $item) {
+				PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($item['configkey'], $item['appid']));
+			}
 		}
 	}
 
