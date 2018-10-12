@@ -45,13 +45,13 @@ Feature: Testing the testing app
 
   Scenario Outline: Testing app returns details about the app
     Given using OCS API version "<ocs-api-version>"
-    And the app "user_management" has been enabled
-    When the administrator requests the details about the app "user_management"
+    And the app "testing" has been enabled
+    When the administrator requests the details about the app "testing"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
     And the response should contain the installed version of the app
-    And the response should have the name of the app "user_management"
+    And the response should have the name of the app "testing"
     And the response should have the app enabled status of app
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
