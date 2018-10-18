@@ -43,6 +43,9 @@ class SlowdownPlugin extends ServerPlugin {
 	 */
 	private $logger;
 
+	/** @var array */
+	private $slowDownSettings;
+
 	/**
 	 * SlowdownPlugin plugin
 	 *
