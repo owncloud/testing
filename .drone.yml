@@ -37,6 +37,13 @@ pipeline:
       matrix:
         NEED_INSTALL_APP: true
 
+  owncloud-log:
+    image: owncloud/ubuntu:16.04
+    detach: true
+    pull: true
+    commands:
+      - tail -f /var/www/owncloud/data/owncloud.log
+
   fix-permissions:
     image: owncloudci/php:${PHP_VERSION}
     pull: true
