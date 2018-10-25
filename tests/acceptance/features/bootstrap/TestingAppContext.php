@@ -25,6 +25,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
 
@@ -46,6 +47,13 @@ class TestingAppContext implements Context {
 	 * @var int
 	 */
 	private $testingAppVersion = 1;
+
+	/**
+	 * List of files created by the testing app
+	 *
+	 * @var array
+	 */
+	private $createdFilePaths = [];
 
 	/**
 	 * Returns base url for the testing app
@@ -433,6 +441,128 @@ class TestingAppContext implements Context {
 			PHPUnit_Framework_Assert::assertSame($appEnabled, $actualAppEnabledStatus);
 		} else {
 			throw new \Exception("App enabled status could not be found in the response.");
+		}
+	}
+
+	/**
+	 * @When the administrator creates the file :path with content :content using the testing API
+	 *
+	 * @param string $path
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesTheFileUsingTheTestingApi($path, $content) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/file"),
+			['file'=>$path, 'content'=>$content],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() === 200) {
+			\array_push($this->createdFilePaths, $path);
+		}
+	}
+
+	/**
+	 * @When the administrator reads the contents of the file :path using the testing API
+	 *
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function theAdministratorReadsTheContentsOfTheFileUsingTheTestingApi($path) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/file?file={$path}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the file :path with content :content should exist in the server root
+	 *
+	 * @param string $path
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function theFileWithContentShouldExistInTheServerRoot($path, $content) {
+		$this->theAdministratorReadsTheContentsOfTheFileUsingTheTestingApi($path);
+		PHPUnit_Framework_Assert::assertSame(
+			200,
+			$this->featureContext->getResponse()->getStatusCode(),
+			"The file was not found in the server"
+		);
+		$result = \json_encode(
+			HttpRequestHelper::getResponseXml($this->featureContext->getResponse())
+		);
+		$fileContent = \json_decode($result, 1)['data']['element']['data'];
+		PHPUnit_Framework_Assert::assertSame(
+			$content,
+			$fileContent,
+			"The content of the file does not match with '{$content}'"
+		);
+	}
+
+	/**
+	 * @Given the administrator has created the file :path with content :content
+	 *
+	 * @param string $path
+	 * @param string $content
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedTheFileWithContent($path, $content) {
+		$this->theAdministratorCreatesTheFileUsingTheTestingApi($path, $content);
+		PHPUnit_Framework_Assert::assertSame(
+			200,
+			$this->featureContext->getResponse()->getStatusCode()
+		);
+	}
+
+	/**
+	 * @When the administrator deletes the file :path using the testing API
+	 *
+	 * @param string $path
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheFileUsingTheTestingApi($path) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/file"),
+			['file'=>$path],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * After Scenario. delete files created while testing
+	 *
+	 * @AfterScenario
+	 *
+	 * @return void
+	 */
+	public function deleteAllCreatedFiles() {
+		foreach ($this->createdFilePaths as $path) {
+			$this->theAdministratorDeletesTheFileUsingTheTestingApi($path);
 		}
 	}
 

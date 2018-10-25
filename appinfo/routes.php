@@ -239,6 +239,14 @@ API::register(
 	API::ADMIN_AUTH
 );
 
+API::register(
+	'get',
+	'/apps/testing/api/v1/file',
+	[$serverFiles, 'readFile'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
 $davSlowDown = new DavSlowdown();
 
 API::register(

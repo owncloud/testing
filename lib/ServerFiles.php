@@ -125,6 +125,27 @@ class ServerFiles {
 	}
 
 	/**
+	 * Get the contents of specified file under the server root
+	 *
+	 * 'file' is the file to get, including path from the server root
+	 * e.g. 'apps2/myapp/appinfo/info.xml'
+	 *
+	 * @return Result
+	 */
+	public function readFile() {
+		$filePath = \trim($this->request->getParam('file'), '/');
+		$targetFile = \OC::$SERVERROOT . "/$filePath";
+		if (\file_exists($targetFile)) {
+			$contents = \trim(\file_get_contents($targetFile));
+			$result[] = [
+				'data' => $contents
+			];
+			return new Result($result);
+		}
+		return new Result(null, 404, "$filePath does not exist");
+	}
+
+	/**
 	 * Create the specified file under the server root
 	 *
 	 * 'file' is the file to create, including path from the server root
@@ -137,8 +158,10 @@ class ServerFiles {
 		$filePath = \trim($this->request->getParam('file'), '/');
 		$content = $this->request->getParam('content');
 		$targetFile = \OC::$SERVERROOT . "/$filePath";
-		\file_put_contents($targetFile, $content);
-
+		$result = \file_put_contents($targetFile, $content);
+		if ($result === false) {
+			return new Result(null, 403, "failed to create $targetFile");
+		}
 		return new Result();
 	}
 
