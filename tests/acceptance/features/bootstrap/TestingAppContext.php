@@ -56,6 +56,13 @@ class TestingAppContext implements Context {
 	private $createdFilePaths = [];
 
 	/**
+	 * List of directories created by the testing app
+	 *
+	 * @var array
+	 */
+	private $createdDirectoryPaths = [];
+
+	/**
 	 * Returns base url for the testing app
 	 *
 	 * @param string $path
@@ -507,6 +514,51 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator creates the directory :dir in server root using the testing API
+	 *
+	 * @param string $dir
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesTheDirectoryInServerRootUsingTheTestingApi($dir) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/dir"),
+			['dir'=>$dir],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() === 200) {
+			\array_push($this->createdDirectoryPaths, $dir);
+		}
+	}
+
+	/**
+	 * @When the administrator deletes the directory :dir using the testing API
+	 *
+	 * @param string $dir
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheDirectoryUsingTheTestingApi($dir) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/dir"),
+			['dir'=>$dir],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * After Scenario. delete files created while testing
 	 *
 	 * @AfterScenario
@@ -516,6 +568,19 @@ class TestingAppContext implements Context {
 	public function deleteAllCreatedFiles() {
 		foreach ($this->createdFilePaths as $path) {
 			$this->theAdministratorDeletesTheFileUsingTheTestingApi($path);
+		}
+	}
+
+	/**
+	 * After Scenario. delete directories created while testing
+	 *
+	 * @AfterScenario
+	 *
+	 * @return void
+	 */
+	public function deleteAllCreatedDirectories() {
+		foreach ($this->createdDirectoryPaths as $dir) {
+			$this->theAdministratorDeletesTheDirectoryUsingTheTestingApi($dir);
 		}
 	}
 
