@@ -63,7 +63,10 @@ class ServerFiles {
 			// Ask for the full mode, it will be masked by the current umask anyway
 			// Create recursively so that multiple levels of directory can be
 			// created at once.
-			\mkdir($targetDir, 0777, true);
+			$result = \mkdir($targetDir, 0777, true);
+			if ($result === false) {
+				return new Result(null, 403, "failed to create $targetDir");
+			}
 		}
 
 		return new Result();
