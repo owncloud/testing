@@ -470,53 +470,6 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator reads the contents of the file :path using the testing API
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theAdministratorReadsTheContentsOfTheFileUsingTheTestingApi($path) {
-		$user = $this->featureContext->getAdminUsername();
-		$response = OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getAdminPassword(),
-			'GET',
-			$this->getBaseUrl("/file?file={$path}"),
-			[],
-			$this->featureContext->getOcsApiVersion()
-			);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Then the file :path with content :content should exist in the server root
-	 *
-	 * @param string $path
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function theFileWithContentShouldExistInTheServerRoot($path, $content) {
-		$this->theAdministratorReadsTheContentsOfTheFileUsingTheTestingApi($path);
-		PHPUnit_Framework_Assert::assertSame(
-			200,
-			$this->featureContext->getResponse()->getStatusCode(),
-			"The file was not found in the server"
-		);
-		$result = \json_encode(
-			HttpRequestHelper::getResponseXml($this->featureContext->getResponse())
-		);
-		$fileContent = \json_decode($result, 1)['data']['element']['data'];
-		PHPUnit_Framework_Assert::assertSame(
-			$content,
-			$fileContent,
-			"The content of the file does not match with '{$content}'"
-		);
-	}
-
-	/**
 	 * @Given the administrator has created the file :path with content :content
 	 *
 	 * @param string $path
