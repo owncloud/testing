@@ -141,7 +141,7 @@ class ServerFiles {
 		if (\file_exists($targetFile)) {
 			$contents = \trim(\file_get_contents($targetFile));
 			$result[] = [
-				'data' => $contents
+				'contentUrlEncoded' => \rawurlencode($contents)
 			];
 			return new Result($result);
 		}
