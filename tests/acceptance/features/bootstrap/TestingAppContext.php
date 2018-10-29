@@ -559,6 +559,63 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator creates a notification with following details using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesANotification(TableNode $table) {
+		$body_array = [];
+		foreach ($table as $item) {
+			$body_array[$item['key']] = $item['value'];
+		}
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/notifications"),
+			$body_array,
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the user :user deletes all notifications using the testing API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theUserDeletesAllNotificationsUsingTheTestingApi($user) {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			'DELETE',
+			$this->getBaseUrl("/notifications"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has created a notification with following details using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedANotification(TableNode $table) {
+		$this->theAdministratorCreatesANotification($table);
+		PHPUnit_Framework_Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
+	}
+
+	/**
 	 * After Scenario. delete files created while testing
 	 *
 	 * @AfterScenario
