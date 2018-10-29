@@ -650,6 +650,56 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * get log file using the testing API
+	 *
+	 * @return void
+	 */
+	public function getLogfile() {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/logfile"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * clear the contents of the logfile using the testing API
+	 *
+	 * @return void
+	 */
+	public function clearLogFile() {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/logfile"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+			);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then log entries should decrease when the administrator clears the logfile
+	 *
+	 * @return void
+	 */
+	public function logEntriesShouldDecreaseWhenTheAdministratorClearsTheLogfile() {
+		$this->getLogfile();
+		$initialCount = \count($this->featureContext->getResponseXml()->data[0]);
+		$this->clearLogFile();
+		$this->getLogfile();
+		$finalCount = \count($this->featureContext->getResponseXml()->data[0]);
+		PHPUnit_Framework_Assert::assertLessThan($initialCount, $finalCount);
+	}
+
+	/**
 	 * After Scenario. delete files created while testing
 	 *
 	 * @AfterScenario

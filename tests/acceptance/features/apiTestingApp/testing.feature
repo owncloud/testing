@@ -25,6 +25,14 @@ Feature: Testing the testing app
       | 1               | 1          | 100        | 200         | OK                 |
       | 2               | 2          | 200        | 200         | OK                 |
 
+  Scenario Outline: Testing app can delete the logfile
+    Given using OCS API version "<ocs-api-version>"
+    Then log entries should decrease when the administrator clears the logfile
+    Examples:
+      | ocs-api-version |
+      | 1               |
+      | 2               |
+
   Scenario Outline: Admin adds and deletes config key in a app
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds a config key "con" with value "conkey" in app "core" using the testing API
