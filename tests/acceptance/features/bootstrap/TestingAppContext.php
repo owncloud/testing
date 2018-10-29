@@ -616,6 +616,40 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator increases the max file id size beyond 32 bits using the testing API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorIncreasesTheMaxFileIdSizeBeyond32BitsUsingTheTestingApi() {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/increasefileid"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the file :path should have file id greater than :max bits for user :user
+	 *
+	 * @param string $path
+	 * @param int $max
+	 * @param $string $user
+	 *
+	 * @return void
+	 */
+	public function theFileShouldHaveFileIdGreaterThanBitsForUser($path, $max, $user) {
+		$max_value = \bindec(\str_repeat("1", $max - 1));
+		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
+		PHPUnit_Framework_Assert::assertGreaterThan($max_value, (int)$currentFileID);
+	}
+
+	/**
 	 * After Scenario. delete files created while testing
 	 *
 	 * @AfterScenario
