@@ -97,3 +97,13 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Testing app can change the max file id length
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator increases the max file id size beyond 32 bits using the testing API
+    And the administrator creates the user "user0" using the provisioning API
+    Then the file "/textfile0.txt" should have file id greater than 32 bits for user "user0"
+    Examples:
+      | ocs-api-version |
+      | 1               |
+      | 2               |
