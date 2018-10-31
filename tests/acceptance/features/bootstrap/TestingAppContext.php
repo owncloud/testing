@@ -558,6 +558,29 @@ class TestingAppContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
+	public function runOccCommandUsingTestingAPI($command) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/occ"),
+			['command'=>$command],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator runs these occ commands using the testing API
+	 */
+	public function theAdministratorRunsTheseOccCommandsUsingTheTestingApi(TableNode $table) {
+		foreach ($table as $item) {
+			$this->runOccCommandUsingTestingAPI($item['command']);
+		}
+	}
+
 	/**
 	 * @When the administrator creates a notification with following details using the testing API
 	 *

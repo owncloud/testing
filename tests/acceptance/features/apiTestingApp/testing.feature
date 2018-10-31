@@ -115,3 +115,21 @@ Feature: Testing the testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
+  Scenario Outline: Testing app can run occ commands
+    Given using OCS API version "<ocs-api-version>"
+    And the app "comments" has been enabled
+    And the app "notifications" has been disabled
+    When the administrator runs these occ commands using the testing API
+      | command                             |
+      | app:disable comments                |
+      | app:enable notifications            |
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And app "comments" should be disabled
+    And app "notifications" should be enabled
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
