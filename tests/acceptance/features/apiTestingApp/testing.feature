@@ -40,7 +40,7 @@ Feature: Testing the testing app
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
     And the app "core" should have config key "con"
-    And the config key "con" of app "core" must have value "conkey"
+    And the config key "con" of app "core" should have value "conkey"
     When the administrator deletes the config key "con" in app "core" using the testing API
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
