@@ -74,68 +74,6 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * Parse list of config keys from the given XML response
-	 *
-	 * @param SimpleXMLElement $responseXml
-	 *
-	 * @return array
-	 */
-	public function parseConfigListFromResponseXml($responseXml) {
-		$configkeyData = \json_decode(\json_encode($responseXml->data), 1);
-		if (isset($configkeyData['element'])) {
-			$configkeyData = $configkeyData['element'];
-		} else {
-			// There are no keys for the app
-			return [];
-		}
-		if (isset($configkeyData[0])) {
-			$configkeyValues = $configkeyData;
-		} else {
-			// There is just 1 key for the app
-			$configkeyValues[0] = $configkeyData;
-		}
-		return $configkeyValues;
-	}
-
-	/**
-	 * Returns a list of config keys for the given app
-	 *
-	 * @param string $appID
-	 *
-	 * @return array
-	 */
-	public function getConfigKeyList($appID) {
-		$response = OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			'GET',
-			$this->getBaseUrl("/app/{$appID}"),
-			[],
-			$this->featureContext->getOcsApiVersion()
-		);
-		return $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml($response));
-	}
-
-	/**
-	 * Check if given config key is present for given app
-	 *
-	 * @param string $key
-	 * @param string $appID
-	 *
-	 * @return bool
-	 */
-	public function checkConfigKeyInApp($key, $appID) {
-		$configkeyList = $this->getConfigKeyList($appID);
-		foreach ($configkeyList as $config) {
-			if ($config['configkey'] === $key) {
-				return  true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	* @When the administrator requests the system-info using the testing API
 	 *
 	 * @return void
@@ -220,29 +158,6 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @Then the config key :key of app :appID must have value :value
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param string $appID
-	 *
-	 * @return void
-	 */
-	public function theConfigKeyOfAppMustHaveValue($key, $appID, $value) {
-		$response = OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			'GET',
-			$this->getBaseUrl("/app/{$appID}/{$key}"),
-			[],
-			$this->featureContext->getOcsApiVersion()
-		);
-		$configkeyValue = \json_decode(\json_encode($this->featureContext->getResponseXml($response)->data[0]->element->value), 1)[0];
-		PHPUnit_Framework_Assert::assertEquals($value, $configkeyValue);
-	}
-
-	/**
 	 * @When the administrator deletes the config key :key in app :appID using the testing API
 	 *
 	 * @param string $key
@@ -275,28 +190,6 @@ class TestingAppContext implements Context {
 
 		PHPUnit_Framework_Assert::assertInternalType('string', $data['server_root']);
 		PHPUnit_Framework_Assert::assertRegExp('/[^\0]+/', $data['server_root']);
-	}
-
-	/**
-	 * @Then /^the app ((?:'[^']*')|(?:"[^"]*")) should (not|)\s?have config key ((?:'[^']*')|(?:"[^"]*"))$/
-	 *
-	 * @param string $appID
-	 * @param string $shouldOrNot
-	 * @param string $key
-	 *
-	 * @return void
-	 */
-	public function theAppShouldHaveConfigKey($appID, $shouldOrNot, $key) {
-		$appID = \trim($appID, $appID[0]);
-		$key = \trim($key, $key[0]);
-
-		$should = ($shouldOrNot !== "not");
-
-		if ($should) {
-			PHPUnit_Framework_Assert::assertTrue($this->checkConfigKeyInApp($key, $appID));
-		} else {
-			PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($key, $appID));
-		}
 	}
 
 	/**
@@ -362,33 +255,12 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @Then /^following config keys should (not|)\s?exist$/
-	 *
-	 * @param string $shouldOrNot
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 */
-	public function followingConfigKeysMustExist($shouldOrNot, TableNode $table) {
-		$should = ($shouldOrNot !== "not");
-		if ($should) {
-			foreach ($table as $item) {
-				PHPUnit_Framework_Assert::assertTrue($this->checkConfigKeyInApp($item['configkey'], $item['appid']));
-			}
-		} else {
-			foreach ($table as $item) {
-				PHPUnit_Framework_Assert::assertFalse($this->checkConfigKeyInApp($item['configkey'], $item['appid']));
-			}
-		}
-	}
-
-	/**
 	 * @Then the response should contain the installed version of the app
 	 *
 	 * @return void
 	 */
 	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
-		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 
 		foreach ($data as $element) {
 			if ($element['configkey'] == 'installed_version') {
@@ -420,7 +292,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 */
 	public function theResponseShouldHaveTheNameOfTheApp($appID) {
-		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 		foreach ($data as $element) {
 			$responseAppName = $element['appid'];
 			PHPUnit_Framework_Assert::assertSame($appID, $responseAppName);
@@ -433,7 +305,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 */
 	public function theResponseShouldHaveTheAppEnabledStatusOfApp() {
-		$data = $this->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
+		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 		foreach ($data as $element) {
 			if ($element['configkey'] == 'enabled') {
 				$appEnabled = $element['value'];
