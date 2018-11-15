@@ -39,13 +39,13 @@ Feature: Testing the testing app
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    And the app "core" should have config key "con"
+    And app "core" should have config key "con"
     And the config key "con" of app "core" should have value "conkey"
     When the administrator deletes the config key "con" in app "core" using the testing API
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    And the app "core" should not have config key "con"
+    And app "core" should not have config key "con"
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
@@ -93,7 +93,7 @@ Feature: Testing the testing app
 
   Scenario Outline: Testing app returns details about the app
     Given using OCS API version "<ocs-api-version>"
-    Given the app "comments" has been enabled
+    Given app "comments" has been enabled
     When the administrator requests the details about the app "comments"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
@@ -109,7 +109,7 @@ Feature: Testing the testing app
   Scenario Outline: Testing app can change the max file id length
     Given using OCS API version "<ocs-api-version>"
     When the administrator increases the max file id size beyond 32 bits using the testing API
-    And the administrator creates the user "user0" using the provisioning API
+    And the administrator creates user "user0" using the provisioning API
     Then the file "/textfile0.txt" should have file id greater than 32 bits for user "user0"
     Examples:
       | ocs-api-version |
@@ -118,8 +118,8 @@ Feature: Testing the testing app
 
   Scenario Outline: Testing app can run occ commands
     Given using OCS API version "<ocs-api-version>"
-    And the app "comments" has been enabled
-    And the app "notifications" has been disabled
+    And app "comments" has been enabled
+    And app "notifications" has been disabled
     When the administrator runs these occ commands using the testing API
       | command                             |
       | app:disable comments                |
