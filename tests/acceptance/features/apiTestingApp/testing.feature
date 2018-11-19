@@ -110,7 +110,7 @@ Feature: Testing the testing app
     Given using OCS API version "<ocs-api-version>"
     When the administrator increases the max file id size beyond 32 bits using the testing API
     And the administrator creates user "user0" using the provisioning API
-    Then the file "/textfile0.txt" should have file id greater than 32 bits for user "user0"
+    Then file "/textfile0.txt" should have file id greater than 32 bits for user "user0"
     Examples:
       | ocs-api-version |
       | 1               |
