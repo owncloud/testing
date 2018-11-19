@@ -324,14 +324,14 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates the file :path with content :content using the testing API
+	 * @When the administrator creates file :path with content :content using the testing API
 	 *
 	 * @param string $path
 	 * @param string $content
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesTheFileUsingTheTestingApi($path, $content) {
+	public function theAdministratorCreatesFileUsingTheTestingApi($path, $content) {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -349,15 +349,15 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @Given the administrator has created the file :path with content :content
+	 * @Given the administrator has created file :path with content :content
 	 *
 	 * @param string $path
 	 * @param string $content
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedTheFileWithContent($path, $content) {
-		$this->theAdministratorCreatesTheFileUsingTheTestingApi($path, $content);
+	public function theAdministratorHasCreatedFileWithContent($path, $content) {
+		$this->theAdministratorCreatesFileUsingTheTestingApi($path, $content);
 		PHPUnit_Framework_Assert::assertSame(
 			200,
 			$this->featureContext->getResponse()->getStatusCode()
@@ -365,13 +365,13 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator deletes the file :path using the testing API
+	 * @When the administrator deletes file :path using the testing API
 	 *
 	 * @param string $path
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesTheFileUsingTheTestingApi($path) {
+	public function theAdministratorDeletesFileUsingTheTestingApi($path) {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -386,13 +386,13 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates the directory :dir in server root using the testing API
+	 * @When the administrator creates directory :dir in server root using the testing API
 	 *
 	 * @param string $dir
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesTheDirectoryInServerRootUsingTheTestingApi($dir) {
+	public function theAdministratorCreatesDirectoryInServerRootUsingTheTestingApi($dir) {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -410,13 +410,13 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator deletes the directory :dir using the testing API
+	 * @When the administrator deletes directory :dir using the testing API
 	 *
 	 * @param string $dir
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesTheDirectoryUsingTheTestingApi($dir) {
+	public function theAdministratorDeletesDirectoryUsingTheTestingApi($dir) {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -454,7 +454,7 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates a notification with following details using the testing API
+	 * @When the administrator creates a notification with the following details using the testing API
 	 *
 	 * @param TableNode $table
 	 *
@@ -479,13 +479,13 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the user :user deletes all notifications using the testing API
+	 * @When user :user deletes all notifications using the testing API
 	 *
 	 * @param string $user
 	 *
 	 * @return void
 	 */
-	public function theUserDeletesAllNotificationsUsingTheTestingApi($user) {
+	public function userDeletesAllNotificationsUsingTheTestingApi($user) {
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -499,7 +499,7 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @Given the administrator has created a notification with following details using the testing API
+	 * @Given the administrator has created a notification with the following details using the testing API
 	 *
 	 * @param TableNode $table
 	 *
@@ -530,7 +530,7 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @Then the file :path should have file id greater than :max bits for user :user
+	 * @Then file :path should have file id greater than :max bits for user :user
 	 *
 	 * @param string $path
 	 * @param int $max
@@ -538,7 +538,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theFileShouldHaveFileIdGreaterThanBitsForUser($path, $max, $user) {
+	public function fileShouldHaveFileIdGreaterThanBitsForUser($path, $max, $user) {
 		$max_value = \bindec(\str_repeat("1", $max - 1));
 		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
 		PHPUnit_Framework_Assert::assertGreaterThan($max_value, (int)$currentFileID);
@@ -603,7 +603,7 @@ class TestingAppContext implements Context {
 	 */
 	public function deleteAllCreatedFiles() {
 		foreach ($this->createdFilePaths as $path) {
-			$this->theAdministratorDeletesTheFileUsingTheTestingApi($path);
+			$this->theAdministratorDeletesFileUsingTheTestingApi($path);
 		}
 	}
 
@@ -616,7 +616,7 @@ class TestingAppContext implements Context {
 	 */
 	public function deleteAllCreatedDirectories() {
 		foreach ($this->createdDirectoryPaths as $dir) {
-			$this->theAdministratorDeletesTheDirectoryUsingTheTestingApi($dir);
+			$this->theAdministratorDeletesDirectoryUsingTheTestingApi($dir);
 		}
 	}
 

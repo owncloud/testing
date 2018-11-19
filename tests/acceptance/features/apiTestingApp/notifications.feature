@@ -10,7 +10,7 @@ Feature: Test notifications feature of testing app
 
   Scenario Outline: Testing app can create notifications for user
     Given using OCS API version "<ocs-api-version>"
-    When the administrator creates a notification with following details using the testing API
+    When the administrator creates a notification with the following details using the testing API
       | key         | value                      |
       | subject     | lorem_subject              |
       | message     | lorem_message              |
@@ -32,13 +32,13 @@ Feature: Test notifications feature of testing app
 
   Scenario Outline: Testing app can delete notifications
     Given using OCS API version "<ocs-api-version>"
-    And the administrator has created a notification with following details using the testing API
+    And the administrator has created a notification with the following details using the testing API
       | key         | value           |
       | user        | user0                      |
-    And the administrator has created a notification with following details using the testing API
+    And the administrator has created a notification with the following details using the testing API
       | key         | value           |
       | user        | user1                      |
-    When the user "user0" deletes all notifications using the testing API
+    When user "user0" deletes all notifications using the testing API
     Then user "user0" should have 0 notifications
     And user "user1" should have 0 notifications
     Examples:
