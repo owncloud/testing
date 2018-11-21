@@ -114,10 +114,10 @@ class Logfile {
 		
 		// Read it and adjust line number if necessary
 		// Otherwise the result would be wrong if file doesn't end with a blank line
-		if (\fread($f, 1) != "\n") {
+		if (\fread($f, 1) !== "\n") {
 			$lines -= 1;
 		}
-		
+
 		// Start reading
 		$output = '';
 		
