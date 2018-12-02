@@ -25,8 +25,6 @@ PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/ph
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-
-
 ##
 ## Build targets
 ##--------------------------------------
@@ -52,13 +50,12 @@ package:
 .PHONY: test-php-unit
 test-php-unit:             ## Run php unit tests
 test-php-unit: ../../lib/composer/bin/phpunit
-	$(PHPUNIT) --configuration ./phpunit.xml --testsuite testing-unit
-
+	$(PHPUNIT) --configuration ./phpunit.xml --testsuite unit
 
 .PHONY: test-php-unit-dbg
 test-php-unit-dbg:         ## Run php unit tests using phpdbg
 test-php-unit-dbg: ../../lib/composer/bin/phpunit
-	$(PHPUNITDBG) --configuration ./phpunit.xml --testsuite testing-unit
+	$(PHPUNITDBG) --configuration ./phpunit.xml --testsuite unit
 
 .PHONY: test-php-lint
 test-php-lint:             ## Run phan
