@@ -49,7 +49,7 @@ class Notifications extends \OCP\AppFramework\Controller {
 	/**
 	 * @NoCSRFRequired
 	 *
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function addNotification() {
 		$notification = $this->manager->createNotification();
@@ -73,18 +73,18 @@ class Notifications extends \OCP\AppFramework\Controller {
 
 		$this->manager->notify($notification);
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 
 	/**
 	 * @NoCSRFRequired
 	 *
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function deleteNotifications() {
 		$notification = $this->manager->createNotification();
 		$this->manager->markProcessed($notification);
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 }

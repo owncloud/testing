@@ -76,7 +76,7 @@ class SlowdownPlugin extends ServerPlugin {
 	 * @param RequestInterface $request request object
 	 * @param ResponseInterface $response response object
 	 * @throws \Sabre\DAV\Exception\Forbidden
-	 * @return boolean
+	 * @return void
 	 */
 	public function sleep(
 		RequestInterface $request, ResponseInterface $response

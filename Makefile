@@ -10,7 +10,7 @@ app_name=$(notdir $(CURDIR))
 build_dir=$(CURDIR)/build
 dist_dir=$(build_dir)/dist
 src_files=README.md LICENSE
-src_dirs=appinfo data img lib locking
+src_dirs=appinfo data img lib
 all_src=$(src_dirs) $(src_files)
 
 # bin file definitions

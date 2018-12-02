@@ -54,7 +54,7 @@ class Logfile {
 
 	/**
 	 *
-	 * @return void
+	 * @return \OC\OCS\Result
 	 * @throws \Exception
 	 */
 	public function clear() {
