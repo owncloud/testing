@@ -16,7 +16,6 @@ all_src=$(src_dirs) $(src_files)
 # bin file definitions
 PHPUNIT=php -d zend.enable_gc=0 ../../lib/composer/bin/phpunit
 PHPUNITDBG=phpdbg -qrr -d memory_limit=4096M -d zend.enable_gc=0 "../../lib/composer/bin/phpunit"
-PHPLINT=php -d zend.enable_gc=0  vendor-bin/php-parallel-lint/vendor/bin/parallel-lint
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
 
 # start with displaying help
@@ -24,8 +23,6 @@ PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/ph
 
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
-
-
 
 ##
 ## Build targets
@@ -52,18 +49,12 @@ package:
 .PHONY: test-php-unit
 test-php-unit:             ## Run php unit tests
 test-php-unit: ../../lib/composer/bin/phpunit
-	$(PHPUNIT) --configuration ./phpunit.xml --testsuite testing-unit
-
+	$(PHPUNIT) --configuration ./phpunit.xml --testsuite unit
 
 .PHONY: test-php-unit-dbg
 test-php-unit-dbg:         ## Run php unit tests using phpdbg
 test-php-unit-dbg: ../../lib/composer/bin/phpunit
-	$(PHPUNITDBG) --configuration ./phpunit.xml --testsuite testing-unit
-
-.PHONY: test-php-lint
-test-php-lint:             ## Run phan
-test-php-lint: vendor-bin/php-parallel-lint/vendor
-	$(PHPLINT) appinfo lib locking
+	$(PHPUNITDBG) --configuration ./phpunit.xml --testsuite unit
 
 .PHONY: test-php-style
 test-php-style:            ## Run php-cs-fixer and check owncloud code-style
@@ -92,12 +83,6 @@ vendor:
 
 vendor/bamarni/composer-bin-plugin:
 	composer install
-
-vendor-bin/php-parallel-lint/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/php-parallel-lint/composer.lock
-	composer bin php-parallel-lint install --no-progress
-
-vendor-bin/php-parallel-lint/composer.lock: vendor-bin/php-parallel-lint/composer.json
-	@echo php-parallel-lint composer.lock is not up to date.
 
 vendor-bin/owncloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/owncloud-codestyle/composer.lock
 	composer bin owncloud-codestyle install --no-progress
