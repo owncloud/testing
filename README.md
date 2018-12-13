@@ -1,6 +1,8 @@
 # testing
 🔧 app for testing ownCloud
 
+[![Build Status](https://drone.owncloud.com/api/badges/owncloud/testing/status.svg?branch=master)](https://drone.owncloud.com/owncloud/testing)
+
 This app provides helpers to facilitate testing. This app is not intended to be used in production instances
 
 ## How to install
