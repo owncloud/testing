@@ -86,6 +86,22 @@ API::register(
 	API::ADMIN_AUTH
 );
 
+API::register(
+	'get',
+	'/apps/testing/api/v1/getextension/{type}',
+	[$config, 'getExtensionForMimeType'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/getextension/{type}/{subtype}',
+	[$config, 'getExtensionForMimeTypeSubType'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
 $locking = new Provisioning(
 	\OC::$server->getLockingProvider(),
 	\OC::$server->getDatabaseConnection(),

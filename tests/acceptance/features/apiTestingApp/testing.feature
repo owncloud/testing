@@ -133,3 +133,27 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Testing app returns all the extensions of a mime type
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator gets all the extensions of mime-type "audio" using the testing API
+    Then the extensions returned should be "flac, m4a, m4b, mp3, m3u, m3u8, oga, ogg, opus, pls, wav"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the OCS status code should be "<ocs-status>"
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Testing app returns all the extensions of a mime type with subtype
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator gets all the extensions of mime-type "audio/ogg" using the testing API
+    Then the extensions returned should be "oga, ogg, opus"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the OCS status code should be "<ocs-status>"
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |

@@ -22,8 +22,9 @@
 namespace OCA\Testing;
 
 use OCP\IConfig;
-use OC\OCS\Result;
 use OCP\IRequest;
+use OC\OCS\Result;
+use OC\Files\Type\Detection;
 
 class Config {
 
@@ -149,5 +150,56 @@ class Config {
 		}
 
 		return new Result($result);
+	}
+
+	/**
+	 * @param array $parameters
+	 *
+	 * @return Result
+	 */
+	public function getExtensionForMimeType($parameters) {
+		$extensions = [];
+		$mimeTypeList = $this->getAllMimeList();
+		$mimeTypeNeedle = $parameters['type'];
+		foreach ($mimeTypeList as $extension => $mimeType) {
+			if (\explode("/", $mimeType[0])[0] === $mimeTypeNeedle) {
+				$extensions[] = $extension;
+			}
+		}
+		return new Result($extensions);
+	}
+
+	/**
+	 * @param array $parameters
+	 *
+	 * @return Result
+	 */
+	public function getExtensionForMimeTypeSubType($parameters) {
+		$extensions = [];
+		$mimeTypeList = $this->getAllMimeList();
+		$mimeTypeNeedle = $parameters['type'] . '/' . $parameters['subtype'];
+		foreach ($mimeTypeList as $extension => $mimeType) {
+			if ($mimeType[0] === $mimeTypeNeedle) {
+				$extensions[] = $extension;
+			}
+		}
+		return new Result($extensions);
+	}
+
+	/**
+	 * get all mime list
+	 *
+	 * @return array
+	 */
+	public function getAllMimeList() {
+		$configDir = \OC::$SERVERROOT . '/config/';
+		$config = new \OC\Config($configDir);
+		$server = new \OC\Server(\OC::$WEBROOT, $config);
+		$detection = new Detection(
+			$server->getURLGenerator(),
+			$configDir,
+			\OC::$SERVERROOT . '/resources/config/'
+		);
+		return $detection->getAllMappings();
 	}
 }

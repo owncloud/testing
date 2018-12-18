@@ -530,6 +530,27 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator gets all the extensions of mime-type :mimetype using the testing API
+	 *
+	 * @param string $mimetype
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsAllTheExtensionsOfMimeTypeUsingTheTestingApi($mimetype) {
+		$extensions = [];
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			"/apps/testing/api/v1/getextension/$mimetype",
+			null,
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then file :path should have file id greater than :max bits for user :user
 	 *
 	 * @param string $path
@@ -592,6 +613,26 @@ class TestingAppContext implements Context {
 		$this->getLogfile();
 		$finalCount = \count($this->featureContext->getResponseXml()->data[0]);
 		PHPUnit_Framework_Assert::assertLessThan($initialCount, $finalCount);
+	}
+
+	/**
+	 * @Then the extensions returned should be :extensions
+	 *
+	 * @param string $extensions seperated by comma
+	 *
+	 * @return void
+	 */
+	public function theExtensionsReturnedShouldBe($extensions) {
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$this->featureContext->getResponse()
+		);
+		$actualExtensions = \json_decode(\json_encode(
+			$responseXml->data[0]), true
+		);
+		$expectedExtensions = \explode(', ', $extensions);
+		PHPUnit_Framework_Assert::assertEquals(
+			$expectedExtensions, $actualExtensions['element']
+		);
 	}
 
 	/**
