@@ -23,7 +23,6 @@ namespace OCA\Testing;
 
 use FilesystemIterator;
 use OC\OCS\Result;
-use OCP\IConfig;
 use OCP\IRequest;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -41,7 +40,6 @@ class ServerFiles {
 	private $request;
 
 	/**
-	 * @param IConfig $config
 	 * @param IRequest $request
 	 */
 	public function __construct(IRequest $request) {
