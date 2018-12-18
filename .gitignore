@@ -1,7 +1,10 @@
 build
-/vendor/
+.php_cs.cache
+
+# Composer
+vendor/
 vendor-bin/**/vendor
 vendor-bin/**/composer.lock
-.php_cs.cache
+
+# Tests - auto-generated files
 /tests/output/
-.cache

@@ -79,7 +79,7 @@ class Provisioning {
 
 	/**
 	 * @param array $parameters
-	 * @return int
+	 * @return string
 	 */
 	protected function getPath($parameters) {
 		$node = \OC::$server->getRootFolder()
@@ -89,28 +89,28 @@ class Provisioning {
 	}
 
 	/**
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function isLockingEnabled() {
 		try {
 			$this->getLockingProvider();
-			return new \OC_OCS_Result(null, 100);
+			return new \OC\OCS\Result(null, 100);
 		} catch (\RuntimeException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_IMPLEMENTED, $e->getMessage());
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_IMPLEMENTED, $e->getMessage());
 		}
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function acquireLock(array $parameters) {
 		try {
 			$path = $this->getPath($parameters);
 		} catch (NoUserException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'User not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'User not found');
 		} catch (NotFoundException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
 		}
 		$type = $this->getType($parameters);
 
@@ -118,24 +118,24 @@ class Provisioning {
 
 		try {
 			$lockingProvider->acquireLock($path, $type);
-			$this->config->setAppValue('testing', 'locking_' . $path, $type);
-			return new \OC_OCS_Result(null, 100);
+			$this->config->setAppValue('testing', 'locking_' . $path, (string) $type);
+			return new \OC\OCS\Result(null, 100);
 		} catch (LockedException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_LOCKED);
+			return new \OC\OCS\Result(null, Http::STATUS_LOCKED);
 		}
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function changeLock(array $parameters) {
 		try {
 			$path = $this->getPath($parameters);
 		} catch (NoUserException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'User not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'User not found');
 		} catch (NotFoundException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
 		}
 		$type = $this->getType($parameters);
 
@@ -143,24 +143,24 @@ class Provisioning {
 
 		try {
 			$lockingProvider->changeLock($path, $type);
-			$this->config->setAppValue('testing', 'locking_' . $path, $type);
-			return new \OC_OCS_Result(null, 100);
+			$this->config->setAppValue('testing', 'locking_' . $path, (string) $type);
+			return new \OC\OCS\Result(null, 100);
 		} catch (LockedException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_LOCKED);
+			return new \OC\OCS\Result(null, Http::STATUS_LOCKED);
 		}
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function releaseLock(array $parameters) {
 		try {
 			$path = $this->getPath($parameters);
 		} catch (NoUserException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'User not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'User not found');
 		} catch (NotFoundException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
 		}
 		$type = $this->getType($parameters);
 
@@ -169,33 +169,33 @@ class Provisioning {
 		try {
 			$lockingProvider->releaseLock($path, $type);
 			$this->config->deleteAppValue('testing', 'locking_' . $path);
-			return new \OC_OCS_Result(null, 100);
+			return new \OC\OCS\Result(null, 100);
 		} catch (LockedException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_LOCKED);
+			return new \OC\OCS\Result(null, Http::STATUS_LOCKED);
 		}
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function isLocked(array $parameters) {
 		try {
 			$path = $this->getPath($parameters);
 		} catch (NoUserException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'User not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'User not found');
 		} catch (NotFoundException $e) {
-			return new \OC_OCS_Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
+			return new \OC\OCS\Result(null, Http::STATUS_NOT_FOUND, 'Path not found');
 		}
 		$type = $this->getType($parameters);
 
 		$lockingProvider = $this->getLockingProvider();
 
 		if ($lockingProvider->isLocked($path, $type)) {
-			return new \OC_OCS_Result(null, 100);
+			return new \OC\OCS\Result(null, 100);
 		}
 
-		return new \OC_OCS_Result(null, Http::STATUS_LOCKED);
+		return new \OC\OCS\Result(null, Http::STATUS_LOCKED);
 	}
 
 	/**
@@ -204,7 +204,7 @@ class Provisioning {
 	 * all locks in the files_lock table are released (set to "0")
 	 *
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function releaseAll(array $parameters) {
 		$type = $this->getType($parameters);
@@ -233,6 +233,6 @@ class Provisioning {
 			}
 		}
 
-		return new \OC_OCS_Result(null, 100);
+		return new \OC\OCS\Result(null, 100);
 	}
 }

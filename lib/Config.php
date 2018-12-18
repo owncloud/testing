@@ -44,7 +44,7 @@ class Config {
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function setAppValue($parameters) {
 		$app = $parameters['appid'];
@@ -53,12 +53,12 @@ class Config {
 		$value = $this->request->getParam('value');
 		$this->config->setAppValue($app, $configKey, $value);
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function deleteAppValue($parameters) {
 		$app = $parameters['appid'];
@@ -66,7 +66,7 @@ class Config {
 
 		$this->config->deleteAppValue($app, $configKey);
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 
 	/**
@@ -87,7 +87,7 @@ class Config {
 	}
 
 	/**
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function setAppValues() {
 		$values = $this->request->getParam('values');
@@ -103,11 +103,11 @@ class Config {
 			}
 		}
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 
 	/**
-	 * @return \OC_OCS_Result
+	 * @return \OC\OCS\Result
 	 */
 	public function deleteAppValues() {
 		$values = $this->request->getParam('values');
@@ -122,7 +122,7 @@ class Config {
 			}
 		}
 
-		return new \OC_OCS_Result();
+		return new \OC\OCS\Result();
 	}
 
 	/**

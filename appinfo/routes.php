@@ -23,15 +23,15 @@ namespace OCA\Testing\AppInfo;
 
 use OCA\Testing\BigFileID;
 use OCA\Testing\Config;
+use OCA\Testing\DavSlowdown;
 use OCA\Testing\Locking\Provisioning;
-use OCA\Testing\Occ;
+use OCA\Testing\Logfile;
 use OCA\Testing\Notifications;
+use OCA\Testing\Occ;
+use OCA\Testing\Opcache;
 use OCA\Testing\ServerFiles;
 use OCA\Testing\SysInfo;
 use OCP\API;
-use OCA\Testing\Opcache;
-use OCA\Testing\Logfile;
-use OCA\Testing\DavSlowdown;
 
 $config = new Config(
 	\OC::$server->getConfig(),
