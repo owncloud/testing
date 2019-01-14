@@ -271,8 +271,8 @@ class TestingAppContext implements Context {
 		}
 
 		if (isset($appName, $version)) {
-			$this->featureContext->invokingTheCommand(
-				"config:list $appName"
+			$this->featureContext->runOcc(
+				["config:list $appName"]
 			);
 			$lastOutput = $this->featureContext->getStdOutOfOccCommand();
 			$lastOutputArray = \json_decode($lastOutput, true);
