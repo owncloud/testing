@@ -74,10 +74,10 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	* @When the administrator requests the system-info using the testing API
+	 * @When the administrator requests the system-info using the testing API
 	 *
 	 * @return void
-	*/
+	 */
 	public function theAdministratorRequestsTheSystemInfoUsingTheTestingApi() {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
@@ -109,14 +109,14 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/logfile/{$number}"),
 			[],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
 	/**
 	 * @When the administrator requests the details about the app :appId
 	 *
-	 * @param int $number
+	 * @param string $appId
 	 *
 	 * @return void
 	 */
@@ -153,7 +153,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/app/{$appID}/{$key}"),
 			["value" => $value],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -175,7 +175,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/app/{$appID}/{$key}"),
 			[],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -213,7 +213,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/apps"),
 			['values' => $requestBody],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -238,7 +238,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/apps"),
 			['values' => $requestBody],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -339,9 +339,9 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/file"),
-			['file'=>$path, 'content'=>$content],
+			['file' => $path, 'content' => $content],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 		if ($response->getStatusCode() === 200) {
 			\array_push($this->createdFilePaths, $path);
@@ -379,7 +379,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/file"),
-			['file'=>$path],
+			['file' => $path],
 			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
@@ -400,7 +400,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/dir"),
-			['dir'=>$dir],
+			['dir' => $dir],
 			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
@@ -424,12 +424,17 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/dir"),
-			['dir'=>$dir],
+			['dir' => $dir],
 			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
 	}
 
+	/**
+	 * @param string $command
+	 *
+	 * @return void
+	 */
 	public function runOccCommandUsingTestingAPI($command) {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
@@ -438,7 +443,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/occ"),
-			['command'=>$command],
+			['command' => $command],
 			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
@@ -446,8 +451,14 @@ class TestingAppContext implements Context {
 
 	/**
 	 * @When the administrator runs these occ commands using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
 	 */
-	public function theAdministratorRunsTheseOccCommandsUsingTheTestingApi(TableNode $table) {
+	public function theAdministratorRunsTheseOccCommandsUsingTheTestingApi(
+		TableNode $table
+	) {
 		foreach ($table as $item) {
 			$this->runOccCommandUsingTestingAPI($item['command']);
 		}
@@ -579,7 +590,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/logfile"),
 			[],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -597,7 +608,7 @@ class TestingAppContext implements Context {
 			$this->getBaseUrl("/logfile"),
 			[],
 			$this->featureContext->getOcsApiVersion()
-			);
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -626,8 +637,11 @@ class TestingAppContext implements Context {
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$this->featureContext->getResponse()
 		);
-		$actualExtensions = \json_decode(\json_encode(
-			$responseXml->data[0]), true
+		$actualExtensions = \json_decode(
+			\json_encode(
+				$responseXml->data[0]
+			),
+			true
 		);
 		$expectedExtensions = \explode(', ', $extensions);
 		PHPUnit_Framework_Assert::assertEquals(
