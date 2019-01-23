@@ -13,6 +13,8 @@ src_files=README.md LICENSE
 src_dirs=appinfo data img lib
 all_src=$(src_dirs) $(src_files)
 
+acceptance_test_deps=vendor-bin/behat/vendor
+
 # bin file definitions
 PHPUNIT=php -d zend.enable_gc=0 ../../lib/composer/bin/phpunit
 PHPUNITDBG=phpdbg -qrr -d memory_limit=4096M -d zend.enable_gc=0 "../../lib/composer/bin/phpunit"
@@ -20,6 +22,7 @@ PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/ph
 PHP_CODESNIFFER=vendor-bin/php_codesniffer/vendor/bin/phpcs
 PHAN=php -d zend.enable_gc=0 vendor-bin/phan/vendor/bin/phan
 PHPSTAN=php -d zend.enable_gc=0 vendor-bin/phpstan/vendor/bin/phpstan
+BEHAT_BIN=vendor-bin/behat/vendor/bin/behat
 
 # start with displaying help
 .DEFAULT_GOAL := help
@@ -30,6 +33,13 @@ help:
 ##---------------------
 ## Build targets
 ##---------------------
+
+.PHONY: clean
+clean: clean-deps
+
+.PHONY: clean-deps
+clean-deps:
+	rm -Rf vendor-bin/**/vendor vendor-bin/**/composer.lock
 
 .PHONY: dist
 dist: ## Build distribution
@@ -82,8 +92,8 @@ test-php-phpstan: vendor-bin/phpstan/vendor
 
 .PHONY: test-acceptance-api
 test-acceptance-api: ## Run php-cs-fixer and fix code style issues
-test-acceptance-api: vendor
-	../../tests/acceptance/run.sh --remote --type api
+test-acceptance-api: $(acceptance_test_deps)
+	BEHAT_BIN=$(BEHAT_BIN) ../../tests/acceptance/run.sh --remote --type api
 
 #
 # Dependency management
@@ -121,3 +131,9 @@ vendor-bin/phpstan/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/phpstan
 
 vendor-bin/phpstan/composer.lock: vendor-bin/phpstan/composer.json
 	@echo phpstan composer.lock is not up to date.
+
+vendor-bin/behat/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/behat/composer.lock
+	composer bin behat install --no-progress
+
+vendor-bin/behat/composer.lock: vendor-bin/behat/composer.json
+	@echo behat composer.lock is not up to date.

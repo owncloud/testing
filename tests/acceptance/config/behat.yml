@@ -1,11 +1,11 @@
 default:
   autoload:
-     '': %paths.base%/../features/bootstrap
+     '': '%paths.base%/../features/bootstrap'
 
   suites:
     apiTestingApp:
       paths:
-        - %paths.base%/../features/apiTestingApp
+        - '%paths.base%/../features/apiTestingApp'
       contexts:
         - TestingAppContext:
         - FeatureContext: &common_feature_context_params
@@ -19,4 +19,4 @@ default:
   extensions:
       jarnaiz\JUnitFormatter\JUnitFormatterExtension:
           filename: report.xml
-          outputDir: %paths.base%/../../output/
+          outputDir: '%paths.base%/../../output/'
