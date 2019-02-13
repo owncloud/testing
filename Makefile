@@ -35,10 +35,15 @@ help:
 ##---------------------
 
 .PHONY: clean
-clean: clean-deps
+clean: clean-build clean-deps
+
+.PHONY: clean-build
+clean-build:
+	rm -Rf $(build_dir)
 
 .PHONY: clean-deps
 clean-deps:
+	rm -Rf vendor
 	rm -Rf vendor-bin/**/vendor vendor-bin/**/composer.lock
 
 .PHONY: dist
