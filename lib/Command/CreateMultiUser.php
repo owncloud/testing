@@ -1,8 +1,9 @@
 <?php
 /**
  * @author Tom Needham <tom@owncloud.com>
+ * @author Piotr Mrowczynski <piotr@owncloud.com>
  *
- * @copyright Copyright (c) 2018, ownCloud GmbH
+ * @copyright Copyright (c) 2019, ownCloud GmbH
  * @license AGPL-3.0
  *
  * This code is free software: you can redistribute it and/or modify
@@ -16,12 +17,14 @@
  *
  * You should have received a copy of the GNU Affero General Public License, version 3,
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
- *
  */
 
 namespace OCA\Testing\Command;
 
 use OC\Core\Command\Base;
+use OCA\DAV\CardDAV\CardDavBackend;
+use OCA\DAV\Connector\Sabre\Principal;
+use OCA\DAV\DAV\GroupPrincipalBackend;
 use OCP\ILogger;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -30,12 +33,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Sabre\VObject\Component\VCard;
 
 /**
- *
- * @author Tom Needham <tom@owncloud.com>
  * Creates, provisions and logs in/out database users.
- *
  */
 class CreateMultiUser extends Base {
 
@@ -43,10 +44,17 @@ class CreateMultiUser extends Base {
 	 * @var IUserManager
 	 */
 	protected $userManager;
+
+	/**
+	 * @var CardDavBackend
+	 */
+	protected $cardDavBackend;
+
 	/**
 	 * @var IUserSession
 	 */
 	protected $session;
+
 	/**
 	 * @var ILogger
 	 */
@@ -60,64 +68,60 @@ class CreateMultiUser extends Base {
 	 *
 	 * @return void
 	 */
-	public function __construct(
-		IUserManager $userManager, IUserSession $session, ILogger $logger
-	) {
+	public function __construct(IUserManager $userManager, IUserSession $session, ILogger $logger) {
 		$this->userManager = $userManager;
 		$this->session = $session;
 		$this->logger = $logger;
+		$userPrincipalBackend = new Principal(
+			\OC::$server->getUserManager(),
+			\OC::$server->getGroupManager()
+		);
+		$groupPrincipalBackend = new GroupPrincipalBackend(
+			\OC::$server->getGroupManager()
+		);
+		$db = \OC::$server->getDatabaseConnection();
+		$dispatcher = \OC::$server->getEventDispatcher();
+		$this->cardDavBackend = new CardDavBackend($db, $userPrincipalBackend, $groupPrincipalBackend, $dispatcher);
 		parent::__construct();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
+	 * @return void
 	 * @see \OC\Core\Command\Base::configure()
 	 *
-	 * @return void
 	 */
 	protected function configure() {
 		parent::configure();
 
 		$defaultUidPrefix = 'zombie-' . \time() . '-';
+		$defaultContactsNumber = 0;
 
 		$this
 			->setName('testing:createusers')
-			->setDescription('Creates and provisions multiple users for testing')
-			->addOption(
-				'prefix', 'p',
-				InputOption::VALUE_REQUIRED, 'userid prefix for created users',
-				$defaultUidPrefix
-			)
-			->addArgument('numUsers', InputArgument::REQUIRED);
+			->setDescription('Creates and provisions multiple users for testing, optionaly generating contacts')
+			->addOption('prefix', 'p', InputOption::VALUE_REQUIRED, 'User userid prefix for created users', $defaultUidPrefix)
+			->addOption('generateContacts', 'c', InputOption::VALUE_REQUIRED, 'Number of CardDav contacts to add for each user', $defaultContactsNumber)
+			->addArgument('numUsers', InputArgument::REQUIRED, 'Number of users to create');
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see \Symfony\Component\Console\Command\Command::execute()
-	 *
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
 	 * @return int|null null or 0 if everything went fine, or an error code
+	 * @see \Symfony\Component\Console\Command\Command::execute()
+	 *
 	 */
-	protected function execute(
-		InputInterface $input, OutputInterface $output
-	) {
-		$numUsersArgument = $input->getArgument('numUsers');
-		if (\is_array($numUsersArgument)) {
-			throw new \Exception("invalid argument");
-		} else {
-			$num = (int) $numUsersArgument;
-		}
+	protected function execute(InputInterface $input, OutputInterface $output) {
+		$num = $input->getArgument('numUsers');
+		$cont = $input->getOption('generateContacts');
 		$prefix = $input->getOption('prefix');
 		$progress = new ProgressBar($output, $num);
-		$progress->setFormatDefinition(
-			"custom",
-			" %current%/%max% [%bar%] %percent:3s%% Elapsed:%elapsed:6s% " .
-			" Estimated:%estimated:-6s% Remaining:%remaining% %message%\n"
-		);
+		$progress->setFormatDefinition('custom', ' %current%/%max% [%bar%] %percent:3s%% Elapsed:%elapsed:6s% Estimated:%estimated:-6s% Remaining:%remaining% %message%');
 		$progress->setFormat('custom');
 		$usersCreated = 0;
 		$start = \round(\microtime(true) * 1000);
@@ -128,16 +132,25 @@ class CreateMultiUser extends Base {
 			$rate = \round($usersCreated / ($msElapsed / 1000), 1);
 			$progress->setMessage("Creating [$uid] Rate: $rate users/second");
 			try {
-				$this->userManager->createUser($uid, $uid);
+				$user = $this->userManager->createUser($uid, $uid);
 				$this->fakeLoginAndLogout($uid);
+
+				// Create 5 addressbook entries for each user
+				$username = $user->getUID();
+				$addBookId = (string)$this->cardDavBackend->getAddressBooksForUser("principals/users/$username")[0]['id'];
+				for ($n = 0; $n < $cont; $n++) {
+					$uri = $uid . $n . '.vcf';
+					$vCard = new VCard();
+					$vCard->UID = $uri;
+					$vCard->FN = $uid . $n . ' test contact';
+					$this->cardDavBackend->createCard($addBookId, $uri, $vCard->serialize());
+				}
+
 				$usersCreated++;
 			} catch (\Exception $e) {
 				$error = $e->getMessage();
 				$this->logger->logException($e);
-				$output->writeln(
-					"<error>Failed to create user with error: $error</error>"
-				);
-				return 1;
+				$output->writeln("<error>Failed to create user with error: $error</error>");
 			}
 			$progress->advance();
 		}
@@ -155,7 +168,7 @@ class CreateMultiUser extends Base {
 	protected function getUid($prefix, $i) {
 		return $prefix . $i;
 	}
-
+	
 	/**
 	 *
 	 * @param string $uid

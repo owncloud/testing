@@ -9,7 +9,7 @@
 	<dependencies>
 		<owncloud min-version="10.0" max-version="11.0.0" />
 	</dependencies>
-		<commands>
+	<commands>
 		<command>OCA\Testing\Command\CreateMultiUser</command>
 	</commands>
 	<types>
