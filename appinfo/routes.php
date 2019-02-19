@@ -32,6 +32,7 @@ use OCA\Testing\Opcache;
 use OCA\Testing\ServerFiles;
 use OCA\Testing\SysInfo;
 use OCP\API;
+use OCA\Testing\TestingSkeletonDirectory;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -269,6 +270,24 @@ API::register(
 	'put',
 	'/apps/testing/api/v1/davslowdown/{method}/{seconds}',
 	[$davSlowDown, 'setSlowdown'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$skeletonDirectory = new TestingSkeletonDirectory(\OC::$server->getRequest());
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/testingskeletondirectory',
+	[$skeletonDirectory, 'get'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/testingskeletondirectory',
+	[$skeletonDirectory, 'set'],
 	'testing',
 	API::ADMIN_AUTH
 );
