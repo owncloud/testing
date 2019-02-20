@@ -137,7 +137,7 @@ class ServerFiles {
 		$filePath = \trim($this->request->getParam('file'), '/');
 		$targetFile = \OC::$SERVERROOT . "/$filePath";
 		if (\file_exists($targetFile)) {
-			$contents = \trim(\file_get_contents($targetFile));
+			$contents = \file_get_contents($targetFile);
 			$result[] = [
 				'contentUrlEncoded' => \rawurlencode($contents)
 			];
