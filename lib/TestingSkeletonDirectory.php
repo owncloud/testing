@@ -67,6 +67,7 @@ class TestingSkeletonDirectory {
 		if ($fullPath === false || !\file_exists($fullPath)) {
 			return new Result(null, 404, "skeleton directory not found");
 		}
+		\OC::$server->getConfig()->deleteSystemValue('skeletondirectory');
 		\OC::$server->getConfig()->setSystemValue('skeletondirectory', $fullPath);
 		return new Result();
 	}
