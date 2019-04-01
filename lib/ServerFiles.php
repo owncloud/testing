@@ -135,7 +135,12 @@ class ServerFiles {
 	 */
 	public function readFile() {
 		$filePath = \trim($this->request->getParam('file'), '/');
-		$targetFile = \OC::$SERVERROOT . "/$filePath";
+		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		if ($isAbsolutePath === 'true') {
+			$targetFile = "/$filePath";
+		} else {
+			$targetFile = \OC::$SERVERROOT . "/$filePath";
+		}
 		if (\file_exists($targetFile)) {
 			$contents = \file_get_contents($targetFile);
 			$result[] = [
@@ -143,7 +148,7 @@ class ServerFiles {
 			];
 			return new Result($result);
 		}
-		return new Result(null, 404, "$filePath does not exist");
+		return new Result(null, 404, "$targetFile does not exist");
 	}
 
 	/**
