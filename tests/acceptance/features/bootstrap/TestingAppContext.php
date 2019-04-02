@@ -25,6 +25,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
@@ -188,8 +189,8 @@ class TestingAppContext implements Context {
 		$responseXml = $this->featureContext->getResponseXml();
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1);
 
-		PHPUnit_Framework_Assert::assertInternalType('string', $data['server_root']);
-		PHPUnit_Framework_Assert::assertRegExp('/[^\0]+/', $data['server_root']);
+		Assert::assertInternalType('string', $data['server_root']);
+		Assert::assertRegExp('/[^\0]+/', $data['server_root']);
 	}
 
 	/**
@@ -251,7 +252,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorHasAddedTheseConfigKeys(TableNode $table) {
 		$this->theAdministratorAddsTheseConfigKeysUsingTheTestingApi($table);
-		PHPUnit_Framework_Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
+		Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
 	}
 
 	/**
@@ -278,7 +279,7 @@ class TestingAppContext implements Context {
 			$lastOutputArray = \json_decode($lastOutput, true);
 			$app_version = $lastOutputArray['apps'][$appName]['installed_version'];
 
-			PHPUnit_Framework_Assert::assertSame($app_version, $version);
+			Assert::assertSame($app_version, $version);
 		} else {
 			throw new \Exception("Version info could not be found in the response.");
 		}
@@ -295,7 +296,7 @@ class TestingAppContext implements Context {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 		foreach ($data as $element) {
 			$responseAppName = $element['appid'];
-			PHPUnit_Framework_Assert::assertSame($appID, $responseAppName);
+			Assert::assertSame($appID, $responseAppName);
 		}
 	}
 
@@ -317,7 +318,7 @@ class TestingAppContext implements Context {
 			$lastOutput = $this->featureContext->getStdOutOfOccCommand();
 			$lastOutputArray = \json_decode($lastOutput, true);
 			$actualAppEnabledStatus = $lastOutputArray['apps'][$appName]['enabled'];
-			PHPUnit_Framework_Assert::assertSame($appEnabled, $actualAppEnabledStatus);
+			Assert::assertSame($appEnabled, $actualAppEnabledStatus);
 		} else {
 			throw new \Exception("App enabled status could not be found in the response.");
 		}
@@ -358,7 +359,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorHasCreatedFileWithContent($path, $content) {
 		$this->theAdministratorCreatesFileUsingTheTestingApi($path, $content);
-		PHPUnit_Framework_Assert::assertSame(
+		Assert::assertSame(
 			200,
 			$this->featureContext->getResponse()->getStatusCode()
 		);
@@ -518,7 +519,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorHasCreatedANotification(TableNode $table) {
 		$this->theAdministratorCreatesANotification($table);
-		PHPUnit_Framework_Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
+		Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
 	}
 
 	/**
@@ -573,7 +574,7 @@ class TestingAppContext implements Context {
 	public function fileShouldHaveFileIdGreaterThanBitsForUser($path, $max, $user) {
 		$max_value = \bindec(\str_repeat("1", $max - 1));
 		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
-		PHPUnit_Framework_Assert::assertGreaterThan($max_value, (int)$currentFileID);
+		Assert::assertGreaterThan($max_value, (int)$currentFileID);
 	}
 
 	/**
@@ -623,7 +624,7 @@ class TestingAppContext implements Context {
 		$this->clearLogFile();
 		$this->getLogfile();
 		$finalCount = \count($this->featureContext->getResponseXml()->data[0]);
-		PHPUnit_Framework_Assert::assertLessThan($initialCount, $finalCount);
+		Assert::assertLessThan($initialCount, $finalCount);
 	}
 
 	/**
@@ -644,7 +645,7 @@ class TestingAppContext implements Context {
 			true
 		);
 		$expectedExtensions = \explode(', ', $extensions);
-		PHPUnit_Framework_Assert::assertEquals(
+		Assert::assertEquals(
 			$expectedExtensions, $actualExtensions['element']
 		);
 	}
