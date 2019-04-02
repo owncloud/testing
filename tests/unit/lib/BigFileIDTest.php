@@ -14,7 +14,7 @@ use Test\TestCase;
  */
 class BigFileIDTest extends TestCase {
 	public function testBigId() {
-		/** @var ILogger | \PHPUnit_Framework_MockObject_MockObject $logger */
+		/** @var ILogger | \PHPUnit\Framework\MockObject\MockObject $logger */
 		$logger = $this->createMock(ILogger::class);
 		$logger->expects(self::once())
 			->method('warning')
