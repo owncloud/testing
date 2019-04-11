@@ -64,6 +64,11 @@ class TestingAppContext implements Context {
 	private $createdDirectoryPaths = [];
 
 	/**
+	 * @var string
+	 */
+	private $initialLockValue;
+
+	/**
 	 * Returns base url for the testing app
 	 *
 	 * @param string $path
@@ -651,6 +656,217 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @Given locking has been enabled
+	 *
+	 * @return void
+	 */
+	public function lockingIsEnabled() {
+		$lockStatus = \trim(
+			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
+		);
+		if ($lockStatus !== 'true') {
+			$res = $this->featureContext->setSystemConfig('filelocking.enabled', 'true', 'boolean');
+			\PHPUnit\Framework\Assert::assertSame(
+				"System config value filelocking.enabled set to boolean true",
+				\trim($res['stdOut'])
+			);
+		}
+	}
+
+	/**
+	 * @Given locking has been disabled
+	 *
+	 * @return void
+	 */
+	public function lockingIsDisabled() {
+		$lockStatus = \trim(
+			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
+		);
+		if ($lockStatus !== 'true') {
+			$res = $this->featureContext->setSystemConfig('filelocking.enabled', 'false', 'boolean');
+			\PHPUnit\Framework\Assert::assertSame(
+				"System config value filelocking.enabled set to boolean false",
+				\trim($res['stdOut'])
+			);
+		}
+	}
+
+	/**
+	 * @When the administrator checks the lock provisioning status using the testing API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksLockProvisioningStatusUsingTheTestingApi() {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/lockprovisioning"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator creates a lock for the file :path with the type :type for user :user
+	 *
+	 * @param string $path
+	 * @param string $type
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesLockForFileWithTypeForUser($path, $type, $user) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}"),
+			['path' => $path],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has created a lock for the file :path with the type :type for user :user
+	 *
+	 * @param string $path
+	 * @param string $type
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedLockForFileWithTypeForUser($path, $type, $user) {
+		$this->theAdministratorCreatesLockForFileWithTypeForUser($path, $type, $user);
+		\PHPUnit\Framework\Assert::assertSame(
+			200,
+			$this->featureContext->getResponse()->getStatusCode()
+		);
+	}
+
+	/**
+	 * @When the administrator checks the lock for the file :path with the type :type for user :user
+	 *
+	 * @param string $path
+	 * @param string $type
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksLockForFileWithTypeForUser($path, $type, $user) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}?path={$path}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator deletes the lock of the file :path with the type :type for user :user
+	 *
+	 * @param string $path
+	 * @param string $type
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesLockFromFileWithTypeForUser($path, $type, $user) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}"),
+			['path' => $path],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator releases all locks of type :type
+	 *
+	 * @param string $type
+	 *
+	 * @return void
+	 */
+	public function theAdministratorReleasesAllLocksOfType($type) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/lockprovisioning/{$type}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator releases all locks
+	 *
+	 * @return void
+	 */
+	public function theAdministratorReleasesAllLocks() {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/lockprovisioning"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has created following locks
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedFollowingLocks(TableNode $table) {
+		foreach ($table as $item) {
+			$this->theAdministratorHasCreatedLockForFileWithTypeForUser($item['path'], $item['type'], $item['user']);
+		}
+	}
+
+	/**
+	 * After Scenario. restore lock status
+	 *
+	 * @AfterScenario
+	 *
+	 * @return void
+	 */
+	public function restoreLockStatus() {
+		if ($this->initialLockValue === 'true') {
+			$this->featureContext->setSystemConfig('filelocking.enabled', 'true', 'boolean');
+		} elseif ($this->initialLockValue === 'false') {
+			$this->featureContext->setSystemConfig('filelocking.enabled', 'false', 'boolean');
+		} else {
+			return;
+		}
+	}
+
+	/**
 	 * After Scenario. delete files created while testing
 	 *
 	 * @AfterScenario
@@ -694,6 +910,9 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getOcPath()
+		);
+		$this->initialLockValue = \trim(
+			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
 		);
 	}
 }
