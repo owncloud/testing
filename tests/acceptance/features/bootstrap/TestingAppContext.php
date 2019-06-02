@@ -837,6 +837,27 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator checks if :module apache module is installed using the testing API
+	 *
+	 * @param string $module
+	 *
+	 * @return void
+	 */
+	public function theAdministratorChecksIfApacheModIsInstalled($module) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/apache_modules/{$module}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Given the administrator has created following locks
 	 *
 	 * @param TableNode $table
