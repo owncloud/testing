@@ -21,6 +21,7 @@
 
 namespace OCA\Testing\AppInfo;
 
+use OCA\Testing\ApacheModules;
 use OCA\Testing\BigFileID;
 use OCA\Testing\Config;
 use OCA\Testing\DavSlowdown;
@@ -152,6 +153,16 @@ API::register(
 	'post',
 	'/apps/testing/api/v1/occ',
 	[$occ, 'execute'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$apacheMod = new ApacheModules((\OC::$server->getRequest()));
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/apache_modules/{module}',
+	[$apacheMod, 'getModule'],
 	'testing',
 	API::ADMIN_AUTH
 );
