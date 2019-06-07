@@ -57,7 +57,7 @@ class Notifications extends \OCP\AppFramework\Controller {
 		$date = \DateTime::createFromFormat(
 			'U', $this->request->getParam('timestamp', 1449585176)
 		); // 2015-12-08T14:32:56+00:00
-		$user = $this->request->getParam('user', 'test1');
+		$user = $this->request->getParam('user', 'user1');
 		$subject = $this->request->getParam('subject', 'testing');
 		$link = $this->request->getParam('link', 'https://www.owncloud.org/');
 		$message = $this->request->getParam('message', 'message');
