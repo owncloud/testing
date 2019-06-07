@@ -139,7 +139,7 @@ Feature: Testing the testing app
     When the administrator gets all the extensions of mime-type "audio" using the testing API
     Then the extensions returned should be "flac, m4a, m4b, mp3, m3u, m3u8, oga, ogg, opus, pls, wav"
     And the HTTP reason phrase should be "<http-reason-phrase>"
-    And the OCS status code should be "<ocs-status>"
+    And the HTTP status code should be "<http-status>"
     And the OCS status code should be "<ocs-status>"
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
@@ -151,9 +151,32 @@ Feature: Testing the testing app
     When the administrator gets all the extensions of mime-type "audio/ogg" using the testing API
     Then the extensions returned should be "oga, ogg, opus"
     And the HTTP reason phrase should be "<http-reason-phrase>"
-    And the OCS status code should be "<ocs-status>"
+    And the HTTP status code should be "<http-status>"
     And the OCS status code should be "<ocs-status>"
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Testing app returns success if the given apache module is loaded
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator checks if "core" apache module is installed using the testing API
+    Then the HTTP reason phrase should be "<http-reason-phrase>"
+    And the HTTP status code should be "<http-status>"
+    And the OCS status code should be "<ocs-status>"
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
+
+  Scenario Outline: Testing app returns failure if the given apache module is not loaded
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator checks if "random_module_123" apache module is installed using the testing API
+    Then the HTTP reason phrase should be "<http-reason-phrase>"
+    And the HTTP status code should be "<http-status>"
+    And the OCS status code should be "<ocs-status>"
+    And the OCS status message should be "<ocs-message>"
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase | ocs-message                                             |
+      | 1               | 998        | 200         | OK                 | random_module_123 could not be found in apache_modules. |
+      | 2               | 404        | 404         | Not Found          | random_module_123 could not be found in apache_modules. |
