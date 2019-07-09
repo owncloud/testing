@@ -34,6 +34,7 @@ use OCA\Testing\ServerFiles;
 use OCA\Testing\SysInfo;
 use OCP\API;
 use OCA\Testing\TestingSkeletonDirectory;
+use OCA\Testing\TrustedServersHandler;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -299,6 +300,40 @@ API::register(
 	'post',
 	'/apps/testing/api/v1/testingskeletondirectory',
 	[$skeletonDirectory, 'set'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$trustedServers = new TrustedServersHandler(\OC::$server->getRequest());
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/trustedservers',
+	[$trustedServers, 'getTrustedServers'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'delete',
+	'/apps/testing/api/v1/trustedservers',
+	[$trustedServers, 'removeTrustedServer'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'delete',
+	'/apps/testing/api/v1/trustedservers/all',
+	[$trustedServers, 'removeAllTrustedServers'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/trustedservers',
+	[$trustedServers, 'addTrustedServer'],
 	'testing',
 	API::ADMIN_AUTH
 );
