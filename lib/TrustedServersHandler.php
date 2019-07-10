@@ -102,7 +102,7 @@ class TrustedServersHandler {
 	}
 
 	/**
-	 * Add given server to the list of trusted server
+	 * Add given server to the list of trusted servers
 	 *
 	 * @return \OC\OCS\Result
 	 */

@@ -41,7 +41,8 @@ return [
 		'lib',
 		'vendor',
 		'../../lib',
-		'../../core'
+		'../../core',
+		'../federation/lib'
 	],
 
 	// A directory list that defines files that will be excluded
@@ -58,7 +59,8 @@ return [
 	'exclude_analysis_directory_list' => [
 		'vendor',
 		'../../lib',
-		'../../core'
+		'../../core',
+		'../federation/lib'
 	],
 
 	// A regular expression to match files to be excluded
