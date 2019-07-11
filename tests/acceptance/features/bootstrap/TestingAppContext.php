@@ -69,6 +69,11 @@ class TestingAppContext implements Context {
 	private $initialLockValue;
 
 	/**
+	 * @var array
+	 */
+	private $initialTrustedServer;
+
+	/**
 	 * Returns base url for the testing app
 	 *
 	 * @param string $path
@@ -871,6 +876,200 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator adds url :url as trusted server using the testing API
+	 *
+	 * @param string $url
+	 *
+	 * @return void
+	 */
+	public function theAdministratorAddsUrlAsTrustedServerUsingTheTestingApi($url) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/trustedservers"),
+			['url' => $url]
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then url :url should be a trusted server
+	 *
+	 * @param string $url
+	 *
+	 * @return  void
+	 */
+	public function urlShouldBeATrustedServer($url) {
+		$trustedServers = $this->getTrustedServers();
+		foreach ($trustedServers as $server => $id) {
+			if ($server === $url) {
+				return;
+			}
+		}
+		\PHPUnit\Framework\Assert::fail("Given url $url is not a trusted server");
+	}
+
+	/**
+	 * @Then the trusted server list should include these urls:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theTrustedServerListShouldIncludeTheseUrls(TableNode $table) {
+		$trustedServers = $this->getTrustedServers();
+		$expected = $table->getColumnsHash();
+
+		foreach ($expected as $server) {
+			$found = false;
+			foreach ($trustedServers as $url => $id) {
+				if ($url === $server['url']) {
+					$found = true;
+					break;
+				}
+			}
+			if (!$found) {
+				\PHPUnit\Framework\Assert::fail("Given url ${server['url']} is not a trusted server");
+			}
+		}
+	}
+
+	/**
+	 * @Given the administrator has added url :url as trusted server
+	 *
+	 * @param string $url
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasAddedUrlAsTrustedServer($url) {
+		$this->theAdministratorAddsUrlAsTrustedServerUsingTheTestingApi($url);
+		$status = $this->featureContext->getResponse()->getStatusCode();
+		if ($status !== 201) {
+			throw new \Exception("The request failed with status $status");
+		}
+	}
+
+	/**
+	 * @When the administrator deletes url :url from trusted servers using the testing API
+	 *
+	 * @param string $url
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesUrlFromTrustedServersUsingTheTestingApi($url) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/trustedservers"),
+			['url' => $url]
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then url :url should not be a trusted server
+	 *
+	 * @param string $url
+	 *
+	 * @return void
+	 */
+	public function urlShouldNotBeATrustedServer($url) {
+		$trustedServers = $this->getTrustedServers();
+		foreach ($trustedServers as $server => $id) {
+			if ($server === $url) {
+				\PHPUnit\Framework\Assert::fail("Given url $url is a trusted server");
+			}
+		}
+	}
+
+	/**
+	 * @When the administrator deletes all trusted servers using the testing API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesAllTrustedServersUsingTheTestingApi() {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/trustedservers/all")
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the trusted server list should be empty
+	 *
+	 * @return void
+	 */
+	public function theTrustedServerListShouldBeEmpty() {
+		$trustedServers = $this->getTrustedServers();
+		\PHPUnit\Framework\Assert::assertEmpty($trustedServers, "Trusted server is not empty");
+	}
+
+	/**
+	 * Get the array of trusted servers in format ["url" => "id"]
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getTrustedServers() {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/trustedservers")
+		);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() !== 200) {
+			throw new Exception("Could not get the list of trusted servers" . $response->getBody()->getContents());
+		}
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$response
+		);
+		$serverData = \json_decode(
+			\json_encode(
+				$responseXml->data
+			),
+			true
+		);
+		if (!\array_key_exists('element', $serverData)) {
+			return [];
+		} else {
+			return isset($serverData['element'][0]) ?
+				\array_column($serverData['element'], 'id', 'url') :
+				\array_column($serverData, 'id', 'url');
+		}
+	}
+
+	/**
+	 * After Scenario. restore trusted servers
+	 *
+	 * @AfterScenario
+	 *
+	 * @return void
+	 */
+	public function restoreTrustedServers() {
+		$currentTrustedServers = $this->getTrustedServers();
+		foreach (\array_diff($currentTrustedServers, $this->initialTrustedServer) as $url => $id) {
+			$this->theAdministratorDeletesUrlFromTrustedServersUsingTheTestingApi($url);
+		}
+		foreach (\array_diff($this->initialTrustedServer, $currentTrustedServers) as $url => $id) {
+			$this->theAdministratorAddsUrlAsTrustedServerUsingTheTestingApi($url);
+		}
+	}
+
+	/**
 	 * After Scenario. restore lock status
 	 *
 	 * @AfterScenario
@@ -935,5 +1134,6 @@ class TestingAppContext implements Context {
 		$this->initialLockValue = \trim(
 			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
 		);
+		$this->initialTrustedServer = $this->getTrustedServers();
 	}
 }
