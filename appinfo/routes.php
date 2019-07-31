@@ -35,6 +35,7 @@ use OCA\Testing\SysInfo;
 use OCP\API;
 use OCA\Testing\TestingSkeletonDirectory;
 use OCA\Testing\TrustedServersHandler;
+use OCA\Testing\FilesProperties;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -337,3 +338,17 @@ API::register(
 	'testing',
 	API::ADMIN_AUTH
 );
+
+// files properties (working with the *properties table)
+$filesProperties = new FilesProperties(
+	\OC::$server->getDatabaseConnection(), \OC::$server->getRequest()
+);
+
+API::register(
+	'PUT',
+	'/apps/testing/api/v1/files_properties',
+	[$filesProperties, 'upsertProperty'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
