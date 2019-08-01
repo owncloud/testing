@@ -351,4 +351,3 @@ API::register(
 	'testing',
 	API::ADMIN_AUTH
 );
-
