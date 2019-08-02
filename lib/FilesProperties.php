@@ -57,7 +57,7 @@ class FilesProperties {
 	 */
 	public function upsertProperty() {
 		$parameters = [];
-		foreach (['user', 'path', 'propertyname', 'propertyvalue'] as $parameterName) {
+		foreach (['user', 'propertyname', 'propertyvalue'] as $parameterName) {
 			$parameters[$parameterName] = $this->request->getParam($parameterName);
 			if ($parameters[$parameterName] === null) {
 				return new Result(
@@ -66,14 +66,25 @@ class FilesProperties {
 			}
 		}
 
-		try {
-			$id = \OC::$server->getUserFolder($parameters['user'])->get($parameters['path'])->getId();
-		} catch (\Exception $e) {
-			return new Result(
-				null,
-				Http::STATUS_INTERNAL_SERVER_ERROR,
-				"Could not get file id: '" . $e->getMessage() . "'"
-			);
+		$parameters['path'] = $this->request->getParam('path');
+		if ($parameters['path'] === null) {
+			$parameters['id'] = $this->request->getParam('id');
+			if ($parameters['id'] === null) {
+				return new Result(
+					null, Http::STATUS_BAD_REQUEST, "parameter id or path must be given"
+				);
+			}
+			$id = (int)$parameters['id'];
+		} else {
+			try {
+				$id = \OC::$server->getUserFolder($parameters['user'])->get($parameters['path'])->getId();
+			} catch (\Exception $e) {
+				return new Result(
+					null,
+					Http::STATUS_INTERNAL_SERVER_ERROR,
+					"Could not get file id: '" . $e->getMessage() . "'"
+				);
+			}
 		}
 		$this->connection
 			->upsert(
