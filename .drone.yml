@@ -13,7 +13,7 @@ pipeline:
       - apps/testing
     version: ${OC_VERSION}
     db_type: ${DB_TYPE}
-    db_name: ${DB_NAME=owncloud}
+    db_name: ${DB_NAME}
     db_host: ${DB_TYPE}
     db_username: autotest
     db_password: owncloud
@@ -105,7 +105,6 @@ pipeline:
       - make test-php-phan
     when:
       matrix:
-        TEST_SUITE: phpunit
         PHAN: true
 
   phpunit-tests:
@@ -171,7 +170,7 @@ services:
     environment:
       - MYSQL_USER=autotest
       - MYSQL_PASSWORD=owncloud
-      - MYSQL_DATABASE=${DB_NAME=owncloud}
+      - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=owncloud
     when:
       matrix:
@@ -182,7 +181,7 @@ services:
     environment:
       - POSTGRES_USER=autotest
       - POSTGRES_PASSWORD=owncloud
-      - POSTGRES_DB=${DB_NAME=owncloud}
+      - POSTGRES_DB=${DB_NAME}
     when:
       matrix:
         DB_TYPE: pgsql
@@ -192,7 +191,7 @@ services:
     environment:
       - ORACLE_USER=system
       - ORACLE_PASSWORD=oracle
-      - ORACLE_DB=${DB_NAME=owncloud}
+      - ORACLE_DB=${DB_NAME}
     when:
       matrix:
         DB_TYPE: oci
@@ -236,12 +235,14 @@ matrix:
       OC_VERSION: daily-master-qa
       TEST_SUITE: phpunit
       DB_TYPE: mysql
+      DB_NAME: owncloud
       NEED_CORE: true
 
     - PHP_VERSION: 7.1
       OC_VERSION: daily-master-qa
       TEST_SUITE: phpunit
       DB_TYPE: pgsql
+      DB_NAME: owncloud
       NEED_CORE: true
 
     - PHP_VERSION: 7.1
@@ -255,6 +256,7 @@ matrix:
       OC_VERSION: daily-master-qa
       TEST_SUITE: phpunit
       DB_TYPE: mysql
+      DB_NAME: owncloud
       NEED_CORE: true
       PHAN: true
 
@@ -262,6 +264,7 @@ matrix:
       OC_VERSION: daily-master-qa
       TEST_SUITE: phpunit
       DB_TYPE: mysql
+      DB_NAME: owncloud
       NEED_CORE: true
       PHAN: true
 
