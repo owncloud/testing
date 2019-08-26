@@ -7,7 +7,7 @@ branches:
 
 pipeline:
   install-core:
-    image: owncloudci/core
+    image: arturneumann/owncloud-ci-core:${PHP_VERSION}
     pull: true
     exclude:
       - apps/testing
@@ -22,7 +22,7 @@ pipeline:
         NEED_CORE: true
 
   install-testrunner:
-    image: owncloudci/php:${PHP_VERSION}
+    image: owncloudci/php:7.2
     pull: true
     commands:
       - git clone -b master --depth=1 https://github.com/owncloud/core.git /var/www/owncloud/testrunner
@@ -120,7 +120,7 @@ pipeline:
         TEST_SUITE: phpunit
 
   api-acceptance-tests:
-    image: owncloudci/php:${PHP_VERSION}
+    image: owncloudci/php:7.2
     pull: true
     environment:
       - TEST_SERVER_URL=http://owncloud
@@ -224,6 +224,12 @@ matrix:
       TEST_SUITE: build
 
     # Unit Tests
+    - PHP_VERSION: 5.6
+      OC_VERSION: 9.1.8
+      TEST_SUITE: phpunit
+      DB_TYPE: sqlite
+      NEED_CORE: true
+
     - PHP_VERSION: 7.1
       OC_VERSION: daily-master-qa
       TEST_SUITE: phpunit
@@ -310,6 +316,18 @@ matrix:
   # Acceptance tests against latest stable release of core
     - PHP_VERSION: 7.1
       OC_VERSION: 10.2.1
+      TEST_SUITE: api-acceptance
+      BEHAT_SUITE: apiTestingApp
+      DB_TYPE: mysql
+      DB_NAME: owncloud
+      NEED_CORE: true
+      NEED_SERVER: true
+      NEED_INSTALL_APP: true
+      USE_RELEASE_TARBALL: true
+
+    # Acceptance tests against latest stable release of core
+    - PHP_VERSION: 5.6
+      OC_VERSION: 9.1.8
       TEST_SUITE: api-acceptance
       BEHAT_SUITE: apiTestingApp
       DB_TYPE: mysql
