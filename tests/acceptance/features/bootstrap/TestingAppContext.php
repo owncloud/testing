@@ -264,6 +264,7 @@ class TestingAppContext implements Context {
 	 * @Then the response should contain the installed version of the app
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
@@ -309,6 +310,7 @@ class TestingAppContext implements Context {
 	 * @Then the response should have the app enabled status of app
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function theResponseShouldHaveTheAppEnabledStatusOfApp() {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
@@ -554,7 +556,6 @@ class TestingAppContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorGetsAllTheExtensionsOfMimeTypeUsingTheTestingApi($mimetype) {
-		$extensions = [];
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
@@ -572,7 +573,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @param string $path
 	 * @param int $max
-	 * @param $string $user
+	 * @param string $user
 	 *
 	 * @return void
 	 */
@@ -635,7 +636,7 @@ class TestingAppContext implements Context {
 	/**
 	 * @Then the extensions returned should be :extensions
 	 *
-	 * @param string $extensions seperated by comma
+	 * @param string $extensions separated by comma
 	 *
 	 * @return void
 	 */
@@ -659,6 +660,7 @@ class TestingAppContext implements Context {
 	 * @Given locking has been enabled
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function lockingIsEnabled() {
 		$lockStatus = \trim(
@@ -677,6 +679,7 @@ class TestingAppContext implements Context {
 	 * @Given locking has been disabled
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function lockingIsDisabled() {
 		$lockStatus = \trim(
@@ -876,6 +879,7 @@ class TestingAppContext implements Context {
 	 * @AfterScenario
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function restoreLockStatus() {
 		if ($this->initialLockValue === 'true') {

@@ -4,6 +4,7 @@ namespace OCA\Testing\Tests\Unit\Lib;
 
 use OCA\Testing\BigFileID;
 use OCP\ILogger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 /**
@@ -14,7 +15,7 @@ use Test\TestCase;
  */
 class BigFileIDTest extends TestCase {
 	public function testBigId() {
-		/** @var ILogger | \PHPUnit\Framework\MockObject\MockObject $logger */
+		/** @var ILogger | MockObject $logger */
 		$logger = $this->createMock(ILogger::class);
 		$logger->expects(self::once())
 			->method('warning')
