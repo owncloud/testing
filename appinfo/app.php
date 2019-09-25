@@ -21,7 +21,7 @@
 
 namespace OCA\Testing;
 
-$app = new \OCA\Testing\Application();
+$app = new Application();
 
 \OC::$server->getNotificationManager()->registerNotifier(
 	function () {

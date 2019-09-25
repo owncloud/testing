@@ -126,7 +126,7 @@ API::register(
 	'files_lockprovisioning',
 	API::ADMIN_AUTH
 );
-//relase all locks that were set by the testing app
+//release all locks that were set by the testing app
 //if global=true in the requests also locks that were not set by the testing app get cleared
 API::register(
 	'delete',
@@ -184,13 +184,13 @@ $notifications = new Notifications(
 	\OC::$server->getRequest(),
 	\OC::$server->getNotificationManager()
 );
-\OCP\API::register(
+API::register(
 	'delete',
 	'/apps/testing/api/v1/notifications',
 	[$notifications, 'deleteNotifications'],
 	'notifications'
 );
-\OCP\API::register(
+API::register(
 	'post',
 	'/apps/testing/api/v1/notifications',
 	[$notifications, 'addNotification'],
