@@ -4,6 +4,7 @@ namespace OCA\Testing\Tests\Unit\Lib;
 
 use OC\AppFramework\Http\Request;
 use OCA\Testing\ApacheModules;
+use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 /**
@@ -12,6 +13,11 @@ use Test\TestCase;
  * @package OCA\Testing\Tests\Unit\Lib
  */
 class ApacheModulesTest extends TestCase {
+	/**
+	 * @var MockObject
+	 */
+	private $apacheModule;
+
 	public function setUp() {
 		parent::setUp();
 
