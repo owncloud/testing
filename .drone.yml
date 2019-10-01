@@ -1,333 +1,1196 @@
+---
+kind: pipeline
+name: matrix-1
+
+platform:
+  os: linux
+  arch: amd64
+
 workspace:
   base: /var/www/owncloud
   path: apps/testing
 
-branches:
-  - master
+steps:
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
 
-pipeline:
-  install-core:
-    image: owncloudci/core
-    pull: true
-    exclude:
-      - apps/testing
-    version: ${OC_VERSION}
-    db_type: ${DB_TYPE}
-    db_name: ${DB_NAME}
-    db_host: ${DB_TYPE}
-    db_username: autotest
+- name: owncloud-coding-standard
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - make test-php-style
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-2
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: sqlite
+    db_name: owncloud
     db_password: owncloud
-    when:
-      matrix:
-        NEED_CORE: true
+    db_type: sqlite
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
 
-  install-testrunner:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - git clone -b master --depth=1 https://github.com/owncloud/core.git /var/www/owncloud/testrunner
-      - cp -r /var/www/owncloud/apps/testing /var/www/owncloud/testrunner/apps/
-      - cd /var/www/owncloud/testrunner
-      - make install-composer-deps
-      - make vendor-bin-deps
-    when:
-      matrix:
-        USE_RELEASE_TARBALL: true
+- name: install-app
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - make vendor
+  - cd /var/www/owncloud/
+  - php occ a:l
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ a:e testing
+  - php occ a:l
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
 
-  install-app:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    environment:
-      - COMPOSER_HOME=/var/www/owncloud/apps/testing/.cache/composer
-    commands:
-      - make vendor
-      - cd /var/www/owncloud/
-      - php occ a:l
-      - php occ config:system:set trusted_domains 1 --value=owncloud
-      - php occ a:e testing
-      - php occ a:l
-    when:
-      matrix:
-        NEED_INSTALL_APP: true
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
 
-  owncloud-log:
-    image: owncloud/ubuntu:16.04
-    detach: true
-    pull: true
-    commands:
-      - tail -f /var/www/owncloud/data/owncloud.log
+- name: phpstan
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - make test-php-phpstan
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
 
-  fix-permissions:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - chown www-data /var/www/owncloud -R
-      - if [ "${USE_RELEASE_TARBALL}" = "true" ];
-        then
-        chmod 777 /var/www/owncloud/testrunner/tests/acceptance/filesForUpload -R;
-        chmod +x /var/www/owncloud/testrunner/tests/acceptance/run.sh;
-        else
-        chmod 777 /var/www/owncloud/tests/acceptance/filesForUpload -R;
-        chmod +x /var/www/owncloud/tests/acceptance/run.sh;
-        fi
-    when:
-      matrix:
-        NEED_SERVER: true
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
 
-  owncloud-coding-standard:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - make test-php-style
-    when:
-      matrix:
-        TEST_SUITE: owncloud-coding-standard
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
 
-  phpstan:
-    # phpstan requires php7.1
-    image: owncloudci/php:7.1
-    pull: true
-    environment:
-      - COMPOSER_HOME=/var/www/owncloud/apps/testing/.cache/composer
-    commands:
-      - make test-php-phpstan
-    when:
-      matrix:
-        TEST_SUITE: phpstan
+---
+kind: pipeline
+name: matrix-3
 
-  phan:
-    # phan requires a recent php-ast extension
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    environment:
-      - COMPOSER_HOME=/var/www/owncloud/apps/testing/.cache/composer
-    commands:
-      - make test-php-phan
-    when:
-      matrix:
-        PHAN: true
+platform:
+  os: linux
+  arch: amd64
 
-  phpunit-tests:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    environment:
-      - COVERAGE=${COVERAGE}
-    commands:
-      - if [ "${COVERAGE}" = "false" ]; then make test-php-unit; fi
-      - if [ "${COVERAGE}" = "true" ]; then make test-php-unit-dbg; fi
-    when:
-      matrix:
-        TEST_SUITE: phpunit
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
 
-  api-acceptance-tests:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    environment:
-      - TEST_SERVER_URL=http://owncloud
-      - PLATFORM=Linux
-      - BEHAT_SUITE=${BEHAT_SUITE}
-    commands:
-      - if [ "${USE_RELEASE_TARBALL}" = "true" ]; then cd /var/www/owncloud/testrunner/apps/testing; fi
-      - make test-acceptance-api
-    when:
-      matrix:
-        TEST_SUITE: api-acceptance
+steps:
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
 
-  build:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    commands:
-      - make dist
-    when:
-      matrix:
-        TEST_SUITE: build
+- name: build
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - make dist
 
-  github_release:
-    image: plugins/github-release
-    pull: true
-    secrets: [ github_token ]
+- name: github_release
+  pull: always
+  image: plugins/github-release
+  settings:
+    checksum: sha256
+    file_exists: overwrite
     files: build/dist/testing.tar.gz
     prerelease: true
-    file_exists: overwrite
-    checksum: sha256
-    when:
-      event: tag
-      matrix:
-        TEST_SUITE: build
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    event:
+    - tag
 
-  notify:
-    image: plugins/slack:1
-    pull: true
-    secrets: [slack_webhook]
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
     channel: builds
-    when:
-      status: [failure, changed]
-      event: [push, tag]
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-4
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: sqlite
+    db_name: owncloud
+    db_password: owncloud
+    db_type: sqlite
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: phan
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - make test-php-phan
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-5
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
 
 services:
-  mysql:
-    image: mysql:5.5
-    environment:
-      - MYSQL_USER=autotest
-      - MYSQL_PASSWORD=owncloud
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_ROOT_PASSWORD=owncloud
-    when:
-      matrix:
-        DB_TYPE: mysql
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
 
-  pgsql:
-    image: postgres:9.4
-    environment:
-      - POSTGRES_USER=autotest
-      - POSTGRES_PASSWORD=owncloud
-      - POSTGRES_DB=${DB_NAME}
-    when:
-      matrix:
-        DB_TYPE: pgsql
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
 
-  oci:
-    image: deepdiver/docker-oracle-xe-11g
-    environment:
-      - ORACLE_USER=system
-      - ORACLE_PASSWORD=oracle
-      - ORACLE_DB=${DB_NAME}
-    when:
-      matrix:
-        DB_TYPE: oci
+---
+kind: pipeline
+name: matrix-6
 
-  owncloud:
-    image: owncloudci/php:${PHP_VERSION}
-    pull: true
-    environment:
-      - APACHE_WEBROOT=/var/www/owncloud/
-    command: ["/usr/local/bin/apachectl", "-e", "debug", "-D", "FOREGROUND"]
-    when:
-      matrix:
-        NEED_SERVER: true
+platform:
+  os: linux
+  arch: amd64
 
-matrix:
-  include:
-    # owncloud-coding-standard
-    - PHP_VERSION: 7.0
-      TEST_SUITE: owncloud-coding-standard
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
 
-    # phpstan
-    - PHP_VERSION: 7.2
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpstan
-      DB_TYPE: sqlite
-      DB_NAME: owncloud
-      NEED_CORE: true
-      NEED_INSTALL_APP: true
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: pgsql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: pgsql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
 
-    # build
-    - PHP_VERSION: 7.2
-      TEST_SUITE: build
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
 
-    # Unit Tests
-    - PHP_VERSION: 7.1
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: sqlite
-      DB_NAME: owncloud
-      NEED_CORE: true
-      PHAN: true
-      COVERAGE: false
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
 
-    - PHP_VERSION: 7.1
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      COVERAGE: false
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
 
-    - PHP_VERSION: 7.1
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: pgsql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      COVERAGE: false
+services:
+- name: pgsql
+  pull: if-not-exists
+  image: postgres:9.4
+  environment:
+    POSTGRES_DB: owncloud
+    POSTGRES_PASSWORD: owncloud
+    POSTGRES_USER: autotest
 
-    - PHP_VERSION: 7.1
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: oci
-      DB_NAME: XE
-      NEED_CORE: true
-      COVERAGE: false
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
 
-    - PHP_VERSION: 7.2
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      PHAN: true
-      COVERAGE: false
+---
+kind: pipeline
+name: matrix-7
 
-    - PHP_VERSION: 7.3
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      PHAN: true
-      COVERAGE: false
+platform:
+  os: linux
+  arch: amd64
 
-    - PHP_VERSION: 7.0
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: phpunit
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      PHAN: true
-      COVERAGE: false
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
 
-    # Acceptance Tests
-    - PHP_VERSION: 7.1
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: api-acceptance
-      BEHAT_SUITE: apiTestingApp
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      NEED_SERVER: true
-      NEED_INSTALL_APP: true
-      USE_RELEASE_TARBALL: false
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: oci
+    db_name: XE
+    db_password: owncloud
+    db_type: oci
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
 
-    - PHP_VERSION: 7.2
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: api-acceptance
-      BEHAT_SUITE: apiTestingApp
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      NEED_SERVER: true
-      NEED_INSTALL_APP: true
-      USE_RELEASE_TARBALL: false
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
 
-    - PHP_VERSION: 7.0
-      OC_VERSION: daily-master-qa
-      TEST_SUITE: api-acceptance
-      BEHAT_SUITE: apiTestingApp
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      NEED_SERVER: true
-      NEED_INSTALL_APP: true
-      USE_RELEASE_TARBALL: false
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
 
-  # Acceptance tests against latest stable release of core
-    - PHP_VERSION: 7.1
-      OC_VERSION: 10.2.1
-      TEST_SUITE: api-acceptance
-      BEHAT_SUITE: apiTestingApp
-      DB_TYPE: mysql
-      DB_NAME: owncloud
-      NEED_CORE: true
-      NEED_SERVER: true
-      NEED_INSTALL_APP: true
-      USE_RELEASE_TARBALL: true
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: oci
+  pull: if-not-exists
+  image: deepdiver/docker-oracle-xe-11g
+  environment:
+    ORACLE_DB: XE
+    ORACLE_PASSWORD: oracle
+    ORACLE_USER: system
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-8
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: phan
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - make test-php-phan
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-9
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: phan
+  pull: always
+  image: owncloudci/php:7.3
+  commands:
+  - make test-php-phan
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.3
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-10
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: phan
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - make test-php-phan
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: phpunit-tests
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - if [ "false" = "false" ]; then make test-php-unit; fi
+  - if [ "false" = "true" ]; then make test-php-unit-dbg; fi
+  environment:
+    COVERAGE: false
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-11
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: install-app
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - make vendor
+  - cd /var/www/owncloud/
+  - php occ a:l
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ a:e testing
+  - php occ a:l
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: fix-permissions
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - chown www-data /var/www/owncloud -R
+  - if [ "false" = "true" ]; then chmod 777 /var/www/owncloud/testrunner/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/testrunner/tests/acceptance/run.sh; else chmod 777 /var/www/owncloud/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/tests/acceptance/run.sh; fi
+
+- name: api-acceptance-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "false" = "true" ]; then cd /var/www/owncloud/testrunner/apps/testing; fi
+  - make test-acceptance-api
+  environment:
+    BEHAT_SUITE: apiTestingApp
+    PLATFORM: Linux
+    TEST_SERVER_URL: http://owncloud
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+- name: owncloud
+  pull: always
+  image: owncloudci/php:7.1
+  command:
+  - /usr/local/bin/apachectl
+  - -e
+  - debug
+  - -D
+  - FOREGROUND
+  environment:
+    APACHE_WEBROOT: /var/www/owncloud/
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-12
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: install-app
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - make vendor
+  - cd /var/www/owncloud/
+  - php occ a:l
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ a:e testing
+  - php occ a:l
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: fix-permissions
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - chown www-data /var/www/owncloud -R
+  - if [ "false" = "true" ]; then chmod 777 /var/www/owncloud/testrunner/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/testrunner/tests/acceptance/run.sh; else chmod 777 /var/www/owncloud/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/tests/acceptance/run.sh; fi
+
+- name: api-acceptance-tests
+  pull: always
+  image: owncloudci/php:7.2
+  commands:
+  - if [ "false" = "true" ]; then cd /var/www/owncloud/testrunner/apps/testing; fi
+  - make test-acceptance-api
+  environment:
+    BEHAT_SUITE: apiTestingApp
+    PLATFORM: Linux
+    TEST_SERVER_URL: http://owncloud
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+- name: owncloud
+  pull: always
+  image: owncloudci/php:7.2
+  command:
+  - /usr/local/bin/apachectl
+  - -e
+  - debug
+  - -D
+  - FOREGROUND
+  environment:
+    APACHE_WEBROOT: /var/www/owncloud/
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-13
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: daily-master-qa
+
+- name: install-app
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - make vendor
+  - cd /var/www/owncloud/
+  - php occ a:l
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ a:e testing
+  - php occ a:l
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: fix-permissions
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - chown www-data /var/www/owncloud -R
+  - if [ "false" = "true" ]; then chmod 777 /var/www/owncloud/testrunner/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/testrunner/tests/acceptance/run.sh; else chmod 777 /var/www/owncloud/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/tests/acceptance/run.sh; fi
+
+- name: api-acceptance-tests
+  pull: always
+  image: owncloudci/php:7.0
+  commands:
+  - if [ "false" = "true" ]; then cd /var/www/owncloud/testrunner/apps/testing; fi
+  - make test-acceptance-api
+  environment:
+    BEHAT_SUITE: apiTestingApp
+    PLATFORM: Linux
+    TEST_SERVER_URL: http://owncloud
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+- name: owncloud
+  pull: always
+  image: owncloudci/php:7.0
+  command:
+  - /usr/local/bin/apachectl
+  - -e
+  - debug
+  - -D
+  - FOREGROUND
+  environment:
+    APACHE_WEBROOT: /var/www/owncloud/
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+---
+kind: pipeline
+name: matrix-14
+
+platform:
+  os: linux
+  arch: amd64
+
+workspace:
+  base: /var/www/owncloud
+  path: apps/testing
+
+steps:
+- name: install-core
+  pull: always
+  image: owncloudci/core
+  settings:
+    db_host: mysql
+    db_name: owncloud
+    db_password: owncloud
+    db_type: mysql
+    db_username: autotest
+    exclude:
+    - apps/testing
+    version: 10.2.1
+
+- name: install-testrunner
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - git clone -b master --depth=1 https://github.com/owncloud/core.git /var/www/owncloud/testrunner
+  - cp -r /var/www/owncloud/apps/testing /var/www/owncloud/testrunner/apps/
+  - cd /var/www/owncloud/testrunner
+  - make install-composer-deps
+  - make vendor-bin-deps
+
+- name: install-app
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - make vendor
+  - cd /var/www/owncloud/
+  - php occ a:l
+  - php occ config:system:set trusted_domains 1 --value=owncloud
+  - php occ a:e testing
+  - php occ a:l
+  environment:
+    COMPOSER_HOME: /var/www/owncloud/apps/testing/.cache/composer
+
+- name: owncloud-log
+  pull: always
+  image: owncloud/ubuntu:16.04
+  detach: true
+  commands:
+  - tail -f /var/www/owncloud/data/owncloud.log
+
+- name: fix-permissions
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - chown www-data /var/www/owncloud -R
+  - if [ "true" = "true" ]; then chmod 777 /var/www/owncloud/testrunner/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/testrunner/tests/acceptance/run.sh; else chmod 777 /var/www/owncloud/tests/acceptance/filesForUpload -R; chmod +x /var/www/owncloud/tests/acceptance/run.sh; fi
+
+- name: api-acceptance-tests
+  pull: always
+  image: owncloudci/php:7.1
+  commands:
+  - if [ "true" = "true" ]; then cd /var/www/owncloud/testrunner/apps/testing; fi
+  - make test-acceptance-api
+  environment:
+    BEHAT_SUITE: apiTestingApp
+    PLATFORM: Linux
+    TEST_SERVER_URL: http://owncloud
+
+- name: notify
+  pull: always
+  image: plugins/slack:1
+  settings:
+    channel: builds
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - failure
+    - changed
+
+services:
+- name: mysql
+  pull: if-not-exists
+  image: mysql:5.5
+  environment:
+    MYSQL_DATABASE: owncloud
+    MYSQL_PASSWORD: owncloud
+    MYSQL_ROOT_PASSWORD: owncloud
+    MYSQL_USER: autotest
+
+- name: owncloud
+  pull: always
+  image: owncloudci/php:7.1
+  command:
+  - /usr/local/bin/apachectl
+  - -e
+  - debug
+  - -D
+  - FOREGROUND
+  environment:
+    APACHE_WEBROOT: /var/www/owncloud/
+
+trigger:
+  ref:
+  - refs/tags/**
+  - refs/pull/**
+  - refs/pull-requests/**
+  - refs/merge-requests/**
+  - refs/heads/master
+
+...
