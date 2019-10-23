@@ -1,4 +1,4 @@
-@api
+@api @federation-app-required
 Feature: Test trusted server feature of testing app
 
   Scenario Outline: Add new trusted server using the testing api

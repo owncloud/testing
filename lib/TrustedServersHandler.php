@@ -21,10 +21,9 @@
 
 namespace OCA\Testing;
 
-use OCA\Federation\TrustedServers;
+use OCP\API;
 use OCP\IRequest;
 use OC\OCS\Result;
-use OCA\Federation\DbHandler;
 
 /**
  * controller for TrustedServer testing
@@ -38,7 +37,7 @@ class TrustedServersHandler {
 	private $request;
 
 	/**
-	 * @var TrustedServers
+	 * @var \OCA\Federation\TrustedServers|null
 	 */
 	private $trustedServers;
 
@@ -47,8 +46,14 @@ class TrustedServersHandler {
 	 */
 	public function __construct(IRequest $request) {
 		$this->request = $request;
-		$dbHandler = new DbHandler(\OC::$server->getDatabaseConnection(), \OC::$server->getL10N('federation'));
-		$this->trustedServers = new TrustedServers(
+		$DbHandler = '\OCA\Federation\DbHandler';
+		$TrustedServer = '\OCA\Federation\TrustedServers';
+		if (\class_exists($DbHandler) && \class_exists($TrustedServer)) {
+			$dbHandler = new $DbHandler(
+				\OC::$server->getDatabaseConnection(),
+				\OC::$server->getL10N('federation')
+			);
+			$this->trustedServers = new $TrustedServer(
 				$dbHandler,
 				\OC::$server->getHTTPClientService(),
 				\OC::$server->getLogger(),
@@ -56,7 +61,27 @@ class TrustedServersHandler {
 				\OC::$server->getSecureRandom(),
 				\OC::$server->getConfig(),
 				\OC::$server->getEventDispatcher()
-		);
+			);
+		}
+	}
+
+	/**
+	 * The classes are not present if Federation is disabled.
+	 * Send some useful info if it is currently disabled.
+	 * Otherwise, return the response from the handler
+	 *
+	 * @return \OC\OCS\Result
+	 */
+	public function defaultHandler($param) {
+		if ($this->trustedServers === null) {
+			return new Result(
+				null,
+				API::RESPOND_SERVER_ERROR,
+				'Federation app is disabled. Please enable it to use this api.'
+			);
+		}
+		$handler = $param[0];
+		return $this->{$handler}();
 	}
 
 	/**
