@@ -310,33 +310,37 @@ $trustedServers = new TrustedServersHandler(\OC::$server->getRequest());
 API::register(
 	'get',
 	'/apps/testing/api/v1/trustedservers',
-	[$trustedServers, 'getTrustedServers'],
+	[$trustedServers, 'defaultHandler'],
 	'testing',
-	API::ADMIN_AUTH
+	API::ADMIN_AUTH,
+	['getTrustedServers']
 );
 
 API::register(
 	'delete',
 	'/apps/testing/api/v1/trustedservers',
-	[$trustedServers, 'removeTrustedServer'],
+	[$trustedServers, 'defaultHandler'],
 	'testing',
-	API::ADMIN_AUTH
+	API::ADMIN_AUTH,
+	['removeTrustedServer']
 );
 
 API::register(
 	'delete',
 	'/apps/testing/api/v1/trustedservers/all',
-	[$trustedServers, 'removeAllTrustedServers'],
+	[$trustedServers, 'defaultHandler'],
 	'testing',
-	API::ADMIN_AUTH
+	API::ADMIN_AUTH,
+	['removeAllTrustedServers']
 );
 
 API::register(
 	'post',
 	'/apps/testing/api/v1/trustedservers',
-	[$trustedServers, 'addTrustedServer'],
+	[$trustedServers, 'defaultHandler'],
 	'testing',
-	API::ADMIN_AUTH
+	API::ADMIN_AUTH,
+	['addTrustedServer']
 );
 
 // files properties (working with the *properties table)
