@@ -36,13 +36,13 @@ config = {
 	'phpunit': {
 		'allDatabases' : {
 			'phpVersions': [
-				'7.0',
+				'7.1',
 			],
 			'coverage': False
 		},
 		'reducedDatabases' : {
 			'phpVersions': [
-				'7.1',
+				'7.0',
 				'7.2',
 				'7.3',
 			],
