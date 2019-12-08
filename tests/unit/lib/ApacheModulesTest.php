@@ -18,7 +18,7 @@ class ApacheModulesTest extends TestCase {
 	 */
 	private $apacheModule;
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 
 		$this->apacheModule = $this->getMockBuilder(ApacheModules::class)
