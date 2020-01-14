@@ -25,6 +25,7 @@ use OCA\Testing\ApacheModules;
 use OCA\Testing\BigFileID;
 use OCA\Testing\Config;
 use OCA\Testing\DavSlowdown;
+use OCA\Testing\LastLoginDate;
 use OCA\Testing\Locking\Provisioning;
 use OCA\Testing\Logfile;
 use OCA\Testing\Notifications;
@@ -352,6 +353,24 @@ API::register(
 	'PUT',
 	'/apps/testing/api/v1/files_properties',
 	[$filesProperties, 'upsertProperty'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$date = new LastLoginDate(\OC::$server->getAccountMapper(), \OC::$server->getRequest());
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/lastlogindate/{user}',
+	[$date, 'setLastLoginDate'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/lastlogindate/{user}',
+	[$date, 'getLastLoginDate'],
 	'testing',
 	API::ADMIN_AUTH
 );
