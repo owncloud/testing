@@ -186,6 +186,23 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @Then the last login date in the response should be :day days ago
+	 *
+	 * @param int $day
+	 *
+	 * @return void
+	 */
+	public function theLastLoginDateForUserShouldBe($day) {
+		$responseXml = HttpRequestHelper::getResponseXml(
+			$this->featureContext->getResponse()
+		);
+		$lastLoginTimeStamp = (string)$responseXml->data[0]->element;
+		$currentTimeStamp = \time();
+		$daysAgo = ($currentTimeStamp - $lastLoginTimeStamp) / (24 * 60 * 60);
+		Assert::assertEquals($day, \floor($daysAgo), 'Expected ' . $day . ' days but got ' . $daysAgo . ' days');
+	}
+
+	/**
 	 * @Then the response should contain the server root
 	 *
 	 * @return void
@@ -731,6 +748,49 @@ class TestingAppContext implements Context {
 			'POST',
 			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}"),
 			['path' => $path],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator gets the last login date for user :user using the testing API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorGetsTheLastLoginDateOfUserUsingTheTestingApi($user) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			$this->getBaseUrl("/lastlogindate/{$user}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator sets the last login date for user :arg1 to :arg2 days ago using the testing API
+	 *
+	 * @param string $user
+	 * @param string $days
+	 *
+	 * @return void
+	 */
+	public function theAdministratorSetsTheLastLoginDateForUserToDaysAgoUsingTheTestingApi($user, $days) {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/lastlogindate/{$user}"),
+			['days' => $days],
 			$this->featureContext->getOcsApiVersion()
 		);
 		$this->featureContext->setResponse($response);
