@@ -775,28 +775,6 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator sets the last login date for user :arg1 to :arg2 days ago using the testing API
-	 *
-	 * @param string $user
-	 * @param string $days
-	 *
-	 * @return void
-	 */
-	public function theAdministratorSetsTheLastLoginDateForUserToDaysAgoUsingTheTestingApi($user, $days) {
-		$adminUser = $this->featureContext->getAdminUsername();
-		$response = OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$adminUser,
-			$this->featureContext->getAdminPassword(),
-			'POST',
-			$this->getBaseUrl("/lastlogindate/{$user}"),
-			['days' => $days],
-			$this->featureContext->getOcsApiVersion()
-		);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
 	 * @Given the administrator has created a lock for the file :path with the type :type for user :user
 	 *
 	 * @param string $path
