@@ -681,10 +681,10 @@ class TestingAppContext implements Context {
 	 */
 	public function lockingIsEnabled() {
 		$lockStatus = \trim(
-			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
 		);
 		if ($lockStatus !== 'true') {
-			$res = $this->featureContext->setSystemConfig('filelocking.enabled', 'true', 'boolean');
+			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'true', 'boolean');
 			\PHPUnit\Framework\Assert::assertSame(
 				"System config value filelocking.enabled set to boolean true",
 				\trim($res['stdOut'])
@@ -700,10 +700,10 @@ class TestingAppContext implements Context {
 	 */
 	public function lockingIsDisabled() {
 		$lockStatus = \trim(
-			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
 		);
 		if ($lockStatus !== 'true') {
-			$res = $this->featureContext->setSystemConfig('filelocking.enabled', 'false', 'boolean');
+			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'false', 'boolean');
 			\PHPUnit\Framework\Assert::assertSame(
 				"System config value filelocking.enabled set to boolean false",
 				\trim($res['stdOut'])
@@ -921,9 +921,9 @@ class TestingAppContext implements Context {
 	 */
 	public function restoreLockStatus() {
 		if ($this->initialLockValue === 'true') {
-			$this->featureContext->setSystemConfig('filelocking.enabled', 'true', 'boolean');
+			SetupHelper::setSystemConfig('filelocking.enabled', 'true', 'boolean');
 		} elseif ($this->initialLockValue === 'false') {
-			$this->featureContext->setSystemConfig('filelocking.enabled', 'false', 'boolean');
+			SetupHelper::setSystemConfig('filelocking.enabled', 'false', 'boolean');
 		} else {
 			return;
 		}
@@ -975,7 +975,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getOcPath()
 		);
 		$this->initialLockValue = \trim(
-			$this->featureContext->getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
 		);
 	}
 }
