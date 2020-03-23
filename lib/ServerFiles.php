@@ -199,4 +199,36 @@ class ServerFiles {
 
 		return new Result();
 	}
+
+	/**
+	 * List file in the specified directory under the server root
+	 *'file' is the file to delete, including path from the server root
+	 * 'dir' is the directory to check, which may be inside other directories
+	 * e.g. 'apps2/myapp/appinfo'
+	 *
+	 * @return Result
+	 */
+	public function listFile() {
+		$dir = \trim($this->request->getParam('dir'), '/');
+		if ($dir === "") {
+			return new Result(null, 400, "cannot list file in dir, no dir name given");
+		}
+		$targetDir = \OC::$SERVERROOT . "/$dir";
+		if (\file_exists($targetDir)) {
+			if (\is_dir($targetDir)) {
+				$di = new RecursiveDirectoryIterator(
+					$targetDir, FilesystemIterator::SKIP_DOTS
+				);
+				$ri = new RecursiveIteratorIterator(
+					$di, RecursiveIteratorIterator::CHILD_FIRST
+				);
+				foreach ($ri as $file) {
+					if ($file->isFile()) {
+						$result[] = preg_replace('/..[^d][0-9]{9}/',"",$file->getFilename());
+					}
+				}
+			}
+		}
+		return new Result($result);
+	}
 }
