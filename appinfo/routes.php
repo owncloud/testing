@@ -273,7 +273,7 @@ API::register(
 API::register(
 	'get',
 	'/apps/testing/api/v1/dir',
-	[$serverFiles, 'listFile'],
+	[$serverFiles, 'listFiles'],
 	'testing',
 	API::ADMIN_AUTH
 );
