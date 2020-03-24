@@ -224,7 +224,7 @@ class ServerFiles {
 				);
 				foreach ($ri as $file) {
 					if ($file->isFile()) {
-						$result[] = \preg_replace('/..[^d][0-9]{9}/', "", $file->getFilename());
+						$result[] =$file->getFilename();
 					}
 				}
 			}
