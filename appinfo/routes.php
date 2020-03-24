@@ -272,6 +272,14 @@ API::register(
 
 API::register(
 	'get',
+	'/apps/testing/api/v1/dir',
+	[$serverFiles, 'listFiles'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
 	'/apps/testing/api/v1/file',
 	[$serverFiles, 'readFile'],
 	'testing',
