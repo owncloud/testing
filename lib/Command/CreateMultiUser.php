@@ -100,7 +100,7 @@ class CreateMultiUser extends Base {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null null or 0 if everything went fine, or an error code
+	 * @return int 0 if everything went fine, or an error code
 	 */
 	protected function execute(
 		InputInterface $input, OutputInterface $output
@@ -142,7 +142,7 @@ class CreateMultiUser extends Base {
 			$progress->advance();
 		}
 		$progress->finish();
-		return null;
+		return 0;
 	}
 
 	/**
