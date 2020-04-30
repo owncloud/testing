@@ -59,6 +59,16 @@ config = {
 			'phpVersions': [
 				'7.2',
 				'7.3',
+			],
+		},
+		'api74': {
+			'suites': [
+				'apiTestingApp',
+			],
+			'servers': [
+				'daily-master-qa',
+			],
+			'phpVersions': [
 				'7.4',
 			],
 		},
