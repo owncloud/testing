@@ -57,7 +57,6 @@ config = {
 				'apiTestingApp',
 			],
 			'phpVersions': [
-				'7.2',
 				'7.3',
 			],
 		},
