@@ -212,7 +212,7 @@ class TestingAppContext implements Context {
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1);
 
 		Assert::assertInternalType('string', $data['server_root']);
-		Assert::assertRegExp('/[^\0]+/', $data['server_root']);
+		Assert::assertMatchesRegularExpression('/[^\0]+/', $data['server_root']);
 	}
 
 	/**
