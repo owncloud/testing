@@ -19,10 +19,10 @@ Feature: Test trusted server feature of testing app
     When the administrator adds url "http://new-oc1.com" as trusted server using the testing API
     When the administrator adds url "http://aafnobadal.com" as trusted server using the testing API
     Then the trusted server list should include these urls:
-      | url                         |
-      | http://new-oc.com           |
-      | http://new-oc1.com          |
-      | http://aafnobadal.com       |
+      | url                   |
+      | http://new-oc.com     |
+      | http://new-oc1.com    |
+      | http://aafnobadal.com |
     Examples:
       | ocs-api-version |
       | 1               |

@@ -5,8 +5,8 @@ Feature: Test notifications feature of testing app
     Given app "notifications" has been enabled
     And these users have been created with default attributes and skeleton files:
       | username |
-      | user0    |
-      | user1    |
+      | Alice    |
+      | Brian    |
 
   Scenario Outline: Testing app can create notifications for user
     Given using OCS API version "<ocs-api-version>"
@@ -14,12 +14,12 @@ Feature: Test notifications feature of testing app
       | key         | value                      |
       | subject     | lorem_subject              |
       | message     | lorem_message              |
-      | user        | user0                      |
+      | user        | Alice                      |
       | object_type | local_share                |
       | link        | www.lorem-notification.com |
       | object_id   | 47                         |
-    Then user "user0" should have 1 notifications
-    And the last notification of user "user0" should match these regular expressions
+    Then user "Alice" should have 1 notifications
+    And the last notification of user "Alice" should match these regular expressions
       | key         | regex                          |
       | subject     | /^lorem_subject$/              |
       | message     | /^lorem_message$/              |
@@ -35,13 +35,13 @@ Feature: Test notifications feature of testing app
     Given using OCS API version "<ocs-api-version>"
     And the administrator has created a notification with the following details using the testing API
       | key  | value |
-      | user | user0 |
+      | user | Alice |
     And the administrator has created a notification with the following details using the testing API
       | key  | value |
-      | user | user1 |
-    When user "user0" deletes all notifications using the testing API
-    Then user "user0" should have 0 notifications
-    And user "user1" should have 0 notifications
+      | user | Brian |
+    When user "Alice" deletes all notifications using the testing API
+    Then user "Alice" should have 0 notifications
+    And user "Brian" should have 0 notifications
     Examples:
       | ocs-api-version |
       | 1               |
