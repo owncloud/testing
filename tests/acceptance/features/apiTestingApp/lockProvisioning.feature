@@ -28,9 +28,9 @@ Feature: add and delete locks on files
   Scenario Outline: admin locks a file for a user
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
-    And user "user0" has been created with default attributes and skeleton files
-    When the administrator creates a lock for the file "textfile0.txt" with the type "1" for user "user0"
-    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "user0"
+    And user "Alice" has been created with default attributes and skeleton files
+    When the administrator creates a lock for the file "textfile0.txt" with the type "1" for user "Alice"
+    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
@@ -42,10 +42,10 @@ Feature: add and delete locks on files
   Scenario Outline: admin deletes lock from a file for a user
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
-    And user "user0" has been created with default attributes and skeleton files
-    And the administrator has created a lock for the file "textfile0.txt" with the type "1" for user "user0"
-    When the administrator deletes the lock of the file "textfile0.txt" with the type "1" for user "user0"
-    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "user0"
+    And user "Alice" has been created with default attributes and skeleton files
+    And the administrator has created a lock for the file "textfile0.txt" with the type "1" for user "Alice"
+    When the administrator deletes the lock of the file "textfile0.txt" with the type "1" for user "Alice"
+    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
@@ -57,23 +57,23 @@ Feature: add and delete locks on files
   Scenario Outline: admin releases all locks of one type
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
-    And user "user0" has been created with default attributes and skeleton files
-    And user "user1" has been created with default attributes and skeleton files
+    And user "Alice" has been created with default attributes and skeleton files
+    And user "Brian" has been created with default attributes and skeleton files
     And the administrator has created following locks
-    | path          | type | user  |
-    | textfile0.txt | 1    | user0 |
-    | textfile1.txt | 1    | user1 |
-    | textfile2.txt | 2    | user0 |
+      | path          | type | user  |
+      | textfile0.txt | 1    | Alice |
+      | textfile1.txt | 1    | Brian |
+      | textfile2.txt | 2    | Alice |
     When the administrator releases all locks of type "1"
-    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "user0"
+    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    When the administrator checks the lock for the file "textfile1.txt" with the type "1" for user "user0"
+    When the administrator checks the lock for the file "textfile1.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    When the administrator checks the lock for the file "textfile2.txt" with the type "2" for user "user0"
+    When the administrator checks the lock for the file "textfile2.txt" with the type "2" for user "Alice"
     Then the HTTP status code should be "<http-status-failure>"
     And the HTTP reason phrase should be "<http-reason-phrase-failure>"
     And the OCS status code should be "<ocs-status-failure>"
@@ -85,23 +85,23 @@ Feature: add and delete locks on files
   Scenario Outline: admin releases all locks
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
-    And user "user0" has been created with default attributes and skeleton files
-    And user "user1" has been created with default attributes and skeleton files
+    And user "Alice" has been created with default attributes and skeleton files
+    And user "Brian" has been created with default attributes and skeleton files
     And the administrator has created following locks
-    | path          | type | user  |
-    | textfile0.txt | 1    | user0 |
-    | textfile1.txt | 1    | user1 |
-    | textfile2.txt | 2    | user0 |
+      | path          | type | user  |
+      | textfile0.txt | 1    | Alice |
+      | textfile1.txt | 1    | Brian |
+      | textfile2.txt | 2    | Alice |
     When the administrator releases all locks
-    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "user0"
+    And the administrator checks the lock for the file "textfile0.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    When the administrator checks the lock for the file "textfile1.txt" with the type "1" for user "user0"
+    When the administrator checks the lock for the file "textfile1.txt" with the type "1" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    When the administrator checks the lock for the file "textfile2.txt" with the type "2" for user "user0"
+    When the administrator checks the lock for the file "textfile2.txt" with the type "2" for user "Alice"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"

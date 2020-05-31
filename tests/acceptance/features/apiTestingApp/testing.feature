@@ -22,8 +22,8 @@ Feature: Testing the testing app
     Then the response should contain <line-number> entries
     Examples:
       | ocs-api-version | line-number | ocs-status | http-status | http-reason-phrase |
-      | 1               | 1          | 100        | 200         | OK                 |
-      | 2               | 2          | 200        | 200         | OK                 |
+      | 1               | 1           | 100        | 200         | OK                 |
+      | 2               | 2           | 200        | 200         | OK                 |
 
   Scenario Outline: Testing app can delete the logfile
     Given using OCS API version "<ocs-api-version>"
@@ -54,16 +54,16 @@ Feature: Testing the testing app
   Scenario Outline: Admin adds multiple config keys
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds these config keys using the testing API
-      | appid           | configkey   | value     |
-      | core            | key1        | value1    |
-      | user_management | key2        | value2    |
+      | appid           | configkey | value  |
+      | core            | key1      | value1 |
+      | user_management | key2      | value2 |
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
     And following config keys should exist
-      | appid           | configkey   |
-      | core            | key1        |
-      | user_management | key2        |
+      | appid           | configkey |
+      | core            | key1      |
+      | user_management | key2      |
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
@@ -72,20 +72,20 @@ Feature: Testing the testing app
   Scenario Outline: Admin deletes multiple config keys
     Given using OCS API version "<ocs-api-version>"
     And the administrator has added these config keys
-      | appid           | configkey   | value     |
-      | core            | key1        | value1    |
-      | user_management | key2        | value2    |
+      | appid           | configkey | value  |
+      | core            | key1      | value1 |
+      | user_management | key2      | value2 |
     When the administrator deletes these config keys using the testing API
-      | appid           | configkey   |
-      | core            | key1        |
-      | user_management | key2        |
+      | appid           | configkey |
+      | core            | key1      |
+      | user_management | key2      |
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
     And following config keys should not exist
-      | appid           | configkey   |
-      | core            | key1        |
-      | user_management | key2        |
+      | appid           | configkey |
+      | core            | key1      |
+      | user_management | key2      |
     Examples:
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
@@ -109,8 +109,8 @@ Feature: Testing the testing app
   Scenario Outline: Testing app can change the max file id length
     Given using OCS API version "<ocs-api-version>"
     When the administrator increases the max file id size beyond 32 bits using the testing API
-    And the administrator creates user "user0" using the provisioning API
-    Then file "/textfile0.txt" should have file id greater than 32 bits for user "user0"
+    And the administrator creates user "Alice" using the provisioning API
+    Then file "/textfile0.txt" should have file id greater than 32 bits for user "Alice"
     Examples:
       | ocs-api-version |
       | 1               |
@@ -121,9 +121,9 @@ Feature: Testing the testing app
     And app "comments" has been enabled
     And app "notifications" has been disabled
     When the administrator runs these occ commands using the testing API
-      | command                             |
-      | app:disable comments                |
-      | app:enable notifications            |
+      | command                  |
+      | app:disable comments     |
+      | app:enable notifications |
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
