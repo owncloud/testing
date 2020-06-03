@@ -19,7 +19,7 @@ Feature: Test notifications feature of testing app
       | link        | www.lorem-notification.com |
       | object_id   | 47                         |
     Then user "Alice" should have 1 notifications
-    And the last notification of user "Alice" should match these regular expressions
+    And the last notification of user "Alice" should match these regular expressions about user "Alice"
       | key         | regex                          |
       | subject     | /^lorem_subject$/              |
       | message     | /^lorem_message$/              |
