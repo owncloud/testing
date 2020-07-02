@@ -132,8 +132,13 @@ class TrustedServersHandler {
 	 * @return \OC\OCS\Result
 	 */
 	public function addTrustedServer() {
+		$servers = $this->trustedServers->getServers();
 		$url = $this->request->getParam('url');
-
+		foreach ($servers as $server) {
+			if ($server['url'] == $url) {
+				return new Result(null, 200);
+			}
+		}
 		$this->trustedServers->addServer($url);
 		return new Result(null, 201);
 	}

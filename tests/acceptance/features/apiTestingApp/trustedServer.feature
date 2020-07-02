@@ -13,6 +13,19 @@ Feature: Test trusted server feature of testing app
       | 1               | 201        | 201         | Created            |
       | 2               | 201        | 201         | Created            |
 
+  Scenario Outline: Add already existing trusted server using the testing api
+    Given using OCS API version "<ocs-api-version>"
+    And the administrator has added url "http://aafnobadal.com" as trusted server
+    When the administrator adds url "http://aafnobadal.com" as trusted server using the testing API
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And url "http://aafnobadal.com" should be a trusted server
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 200        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
+
   Scenario Outline: Add multiple trusted servers using the testing api
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds url "http://new-oc.com" as trusted server using the testing API
