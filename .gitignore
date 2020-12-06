@@ -9,3 +9,6 @@ vendor-bin/**/composer.lock
 # Tests - auto-generated files
 /tests/output/
 .phpunit.result.cache
+
+# SonarCloud scanner
+.scannerwork
