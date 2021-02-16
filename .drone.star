@@ -44,7 +44,7 @@ config = {
 				'7.4',
 			],
 			'databases': [
-				'mysql:5.5',
+				'mysql:8.0',
 			],
 			'coverage': False
 		},
