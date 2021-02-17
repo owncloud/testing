@@ -61,6 +61,57 @@ config = {
 				'7.4',
 			],
 		},
+		'api-core-latest': {
+			'suites': [
+				'apiCoreLatest',
+			],
+			'databases': [
+				'mysql:8.0',
+			],
+			'servers': [
+				'daily-master-qa',
+				'latest'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 39,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+		},
+		'webUI-core-latest': {
+			'suites': [
+				'webUILatest',
+			],
+			'databases': [
+				'mysql:8.0',
+			],
+			'servers': [
+				'daily-master-qa',
+				'latest'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 22,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+		},
+		'cli-core-latest': {
+			'suites': [
+				'cliCoreLatest',
+			],
+			'databases': [
+				'mysql:8.0',
+			],
+			'servers': [
+				'daily-master-qa',
+				'latest'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 3,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+		},
 	},
 }
 
