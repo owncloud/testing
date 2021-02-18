@@ -54,14 +54,12 @@ class Occ {
 	}
 
 	/**
+	 * @param string $command
+	 * @param Array $reqEnvVars
 	 *
-	 * @return Result
+	 * @return Array
 	 */
-	public function execute() {
-		$command = $this->request->getParam("command", "");
-		$reqEnvVars = $this->request->getParam("env_variables", []);
-		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
-
+	public function runCommand($command, $reqEnvVars) {
 		// Match the pieces of the string that are like:
 		//   Strings with single-quoted parts and there could be space(s) in the
 		//   single-quoted parts:
@@ -74,6 +72,8 @@ class Occ {
 		//     user:add
 		//     user1
 		//     --password-from-env
+
+		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
 		\preg_match_all("/\S*?'[^']*?'|\S+/", $command, $matches);
 		$args = $matches[0];
 		$args = \array_map(
@@ -112,7 +112,44 @@ class Occ {
 			"stdErr" => $lastStdErr
 		];
 
-		$resultCode = $lastCode + 100;
+		return $result;
+	}
+
+	/**
+	 *
+	 * @return Result
+	 */
+	public function bulkSet() {
+		$data = \json_decode(\file_get_contents('php://input'), true);
+		$results = [];
+		$highCode = 100;
+		foreach ($data as $item) {
+			if (!\array_key_exists("command", $item)) {
+				return new Result(null, 405, "Invalid format for the data, please check!");
+			}
+			if (\array_key_exists("env_variables", $item) && !\is_array($item['env_variables'])) {
+				return new Result(null, 405, "Invalid format for the data, please check!");
+			}
+
+			$result = $this->runCommand($item["command"], $item["env_variables"]);
+			\array_push($results, $result);
+			if ($result['code'] + 100 > $highCode) {
+				$highCode = $result["code"] + 100;
+			}
+		}
+		return new Result($results, $highCode);
+	}
+
+	/**
+	 *
+	 * @return Result
+	 */
+	public function execute() {
+		$command = $this->request->getParam("command", "");
+		$reqEnvVars = $this->request->getParam("env_variables", []);
+
+		$result = $this->runCommand($command, $reqEnvVars);
+		$resultCode = $result['code'] + 100;
 
 		return new Result($result, $resultCode);
 	}

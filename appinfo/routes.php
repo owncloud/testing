@@ -160,6 +160,14 @@ API::register(
 	API::ADMIN_AUTH
 );
 
+API::register(
+	'post',
+	'/apps/testing/api/v1/occ/bulkset',
+	[$occ, 'bulkSet'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
 $apacheMod = new ApacheModules((\OC::$server->getRequest()));
 
 API::register(
