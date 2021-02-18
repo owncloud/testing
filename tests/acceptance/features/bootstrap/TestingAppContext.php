@@ -490,6 +490,46 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @param array $commands
+	 *
+	 * @return void
+	 */
+	public function runBulkOccCommandUsingTestingAPI($commands) {
+		$user = $this->featureContext->getAdminUsername();
+		$commandsBody = [];
+		foreach ($commands as $command) {
+			$commandsBody[] = ['command' => $command];
+		}
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/occ/bulk"),
+			\json_encode($commandsBody),
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator runs these occ commands in bulk using the testing API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRunsTheseOccCommandsInBulkUsingTheTestingApi(
+		TableNode $table
+	) {
+		$commands = [];
+		foreach ($table as $item) {
+			$commands[] = $item['command'];
+		}
+		$this->runBulkOccCommandUsingTestingAPI($commands);
+	}
+
+	/**
 	 * @When the administrator creates a notification with the following details using the testing API
 	 *
 	 * @param TableNode $table

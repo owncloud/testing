@@ -134,6 +134,24 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+  Scenario Outline: Testing app can run occ commands in bulk
+    Given using OCS API version "<ocs-api-version>"
+    And app "comments" has been enabled
+    And app "notifications" has been disabled
+    When the administrator runs these occ commands in bulk using the testing API
+      | command                  |
+      | app:disable comments     |
+      | app:enable notifications |
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And app "comments" should be disabled
+    And app "notifications" should be enabled
+    Examples:
+      | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | 1               | 100        | 200         | OK                 |
+      | 2               | 200        | 200         | OK                 |
+
   Scenario Outline: Testing app returns all the extensions of a mime type
     Given using OCS API version "<ocs-api-version>"
     When the administrator gets all the extensions of mime-type "audio" using the testing API
