@@ -119,7 +119,7 @@ class Occ {
 	 *
 	 * @return Result
 	 */
-	public function bulkSet() {
+	public function bulkOccExecute() {
 		$data = \json_decode(\file_get_contents('php://input'), true);
 		$results = [];
 		$highCode = 100;

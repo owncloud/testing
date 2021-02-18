@@ -162,8 +162,8 @@ API::register(
 
 API::register(
 	'post',
-	'/apps/testing/api/v1/occ/bulkset',
-	[$occ, 'bulkSet'],
+	'/apps/testing/api/v1/occ/bulk',
+	[$occ, 'bulkOccExecute'],
 	'testing',
 	API::ADMIN_AUTH
 );
