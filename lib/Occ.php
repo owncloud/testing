@@ -127,11 +127,17 @@ class Occ {
 			if (!\array_key_exists("command", $item)) {
 				return new Result(null, 405, "Invalid format for the data, please check!");
 			}
-			if (\array_key_exists("env_variables", $item) && !\is_array($item['env_variables'])) {
-				return new Result(null, 405, "Invalid format for the data, please check!");
+			if (\array_key_exists("env_variables", $item)) {
+				if (\is_array($item['env_variables'])) {
+					$envVariables = $item['env_variables'];
+				} else {
+					return new Result(null, 405, "Invalid format for the data, please check!");
+				}
+			} else {
+				$envVariables = [];
 			}
 
-			$result = $this->runCommand($item["command"], $item["env_variables"]);
+			$result = $this->runCommand($item["command"], $envVariables);
 			\array_push($results, $result);
 			if ($result['code'] + 100 > $highCode) {
 				$highCode = $result["code"] + 100;
