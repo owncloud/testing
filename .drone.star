@@ -61,6 +61,58 @@ config = {
 				'7.4',
 			],
 		},
+		'api-core-latest': {
+			'suites': [
+				'apiCoreLatest',
+			],
+			'databases': [
+				'mariadb:10.2'
+			],
+			'servers': [
+				'daily-master-qa'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 35,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+		},
+		'webUI-core-latest': {
+			'suites': [
+				'webUILatest',
+			],
+			'databases': [
+				'mariadb:10.2'
+			],
+			'servers': [
+				'daily-master-qa'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 22,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+			'extraApps': {
+				'files_texteditor': 'make vendor',
+				'richdocuments': 'make vendor',
+			},
+		},
+		'cli-core-latest': {
+			'suites': [
+				'cliCoreLatest',
+			],
+			'databases': [
+				'mariadb:10.2'
+			],
+			'servers': [
+				'daily-master-qa'
+			],
+			'runCoreTests': True,
+			'runAllSuites': True,
+			'numberOfParts': 3,
+			'emailNeeded': True,
+			'federatedServerNeeded': True,
+		},
 	},
 }
 
