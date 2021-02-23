@@ -96,7 +96,7 @@ test-php-phpstan: vendor-bin/phpstan/vendor
 	$(PHPSTAN) analyse --memory-limit=4G --configuration=./phpstan.neon --no-progress --level=5 appinfo lib
 
 .PHONY: test-acceptance-api
-test-acceptance-api: ## Run php-cs-fixer and fix code style issues
+test-acceptance-api: ## Run API acceptance tests
 test-acceptance-api: $(acceptance_test_deps)
 	BEHAT_BIN=$(BEHAT_BIN) ../../tests/acceptance/run.sh --remote --type api
 
