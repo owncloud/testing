@@ -66,15 +66,11 @@ config = {
 				'apiCoreLatest',
 			],
 			'databases': [
-				'mysql:8.0',
-			],
-			'servers': [
-				'daily-master-qa',
-				'latest'
+				'mariadb:10.2'
 			],
 			'runCoreTests': True,
 			'runAllSuites': True,
-			'numberOfParts': 39,
+			'numberOfParts': 35,
 			'emailNeeded': True,
 			'federatedServerNeeded': True,
 		},
@@ -83,28 +79,24 @@ config = {
 				'webUILatest',
 			],
 			'databases': [
-				'mysql:8.0',
-			],
-			'servers': [
-				'daily-master-qa',
-				'latest'
+				'mariadb:10.2'
 			],
 			'runCoreTests': True,
 			'runAllSuites': True,
 			'numberOfParts': 22,
 			'emailNeeded': True,
 			'federatedServerNeeded': True,
+			'extraApps': {
+				'files_texteditor': 'make vendor',
+				'richdocuments': 'make vendor',
+			},
 		},
 		'cli-core-latest': {
 			'suites': [
 				'cliCoreLatest',
 			],
 			'databases': [
-				'mysql:8.0',
-			],
-			'servers': [
-				'daily-master-qa',
-				'latest'
+				'mariadb:10.2'
 			],
 			'runCoreTests': True,
 			'runAllSuites': True,
@@ -813,7 +805,7 @@ def acceptance(ctx):
 	errorFound = False
 
 	default = {
-		'servers': ['daily-master-qa', 'latest'],
+		'servers': ['10.6.0', 'latest'],
 		'browsers': ['chrome'],
 		'phpVersions': ['7.2'],
 		'databases': ['mariadb:10.2'],
