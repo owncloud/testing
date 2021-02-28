@@ -110,6 +110,7 @@ Feature: Testing the testing app
     Given using OCS API version "<ocs-api-version>"
     When the administrator increases the max file id size beyond 32 bits using the testing API
     And the administrator creates user "Alice" using the provisioning API
+    And user "Alice" uploads file with content "anything" to "/textfile0.txt" using the WebDAV API
     Then file "/textfile0.txt" should have file id greater than 32 bits for user "Alice"
     Examples:
       | ocs-api-version |
