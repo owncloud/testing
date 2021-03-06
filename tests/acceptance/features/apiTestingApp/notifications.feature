@@ -3,7 +3,7 @@ Feature: Test notifications feature of testing app
 
   Background:
     Given app "notifications" has been enabled
-    And these users have been created with default attributes and skeleton files:
+    And these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |
