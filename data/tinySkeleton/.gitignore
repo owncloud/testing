@@ -1,0 +1,7 @@
+# This file is a placeholder so that git will keep the tinySkeleton folder
+# In oC10 there is really no such thing as "without skeleton files"
+# If skeletondirectory is not defined in config.php then whatever is in
+# /core/skeleton is used as the skeleton.
+# tinySkeleton can be used by the acceptance tests as the nearest thing to
+#  "without skeleton files"
+# It will have just this .gitignore
