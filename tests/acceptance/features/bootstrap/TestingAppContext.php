@@ -725,7 +725,7 @@ class TestingAppContext implements Context {
 		);
 		if ($lockStatus !== 'true') {
 			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'true', 'boolean');
-			\PHPUnit\Framework\Assert::assertSame(
+			Assert::assertSame(
 				"System config value filelocking.enabled set to boolean true",
 				\trim($res['stdOut'])
 			);
@@ -744,7 +744,7 @@ class TestingAppContext implements Context {
 		);
 		if ($lockStatus !== 'true') {
 			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'false', 'boolean');
-			\PHPUnit\Framework\Assert::assertSame(
+			Assert::assertSame(
 				"System config value filelocking.enabled set to boolean false",
 				\trim($res['stdOut'])
 			);
@@ -825,7 +825,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorHasCreatedLockForFileWithTypeForUser($path, $type, $user) {
 		$this->theAdministratorCreatesLockForFileWithTypeForUser($path, $type, $user);
-		\PHPUnit\Framework\Assert::assertSame(
+		Assert::assertSame(
 			200,
 			$this->featureContext->getResponse()->getStatusCode()
 		);
@@ -948,6 +948,68 @@ class TestingAppContext implements Context {
 	public function theAdministratorHasCreatedFollowingLocks(TableNode $table) {
 		foreach ($table as $item) {
 			$this->theAdministratorHasCreatedLockForFileWithTypeForUser($item['path'], $item['type'], $item['user']);
+		}
+	}
+
+	/**
+	 * Expires last created share using the testing API
+	 *
+	 * @return void
+	 */
+	public function expireLastCreatedUserShare() {
+		$adminUser = $this->featureContext->getAdminUsername();
+		$share_id = $this->featureContext->getLastShareId();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$adminUser,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/expire-share/{$share_id}"),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given the administrator has expired the last created share using the testing API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasExpiredTheLastCreatedShare() {
+		$this->expireLastCreatedUserShare();
+		Assert::assertSame(
+			200,
+			$this->featureContext->getResponse()->getStatusCode(),
+			"Request to expire last share failed."
+		);
+	}
+
+	/**
+	 * @When the administrator expires the last created share using the testing API
+	 *
+	 * @return void
+	 */
+	public function theAdministratorExpiresTheLastCreatedShare() {
+		$this->expireLastCreatedUserShare();
+	}
+
+	/**
+	 * @Then the fields of the last response should include
+	 *
+	 * @param TableNode $body
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
+	public function theFieldsOfTheLastResponseShouldInclude(TableNode $body) {
+		$this->featureContext->verifyTableNodeColumnsCount($body, 2);
+		$bodyRows = $body->getRowsHash();
+		foreach ($bodyRows as $field => $value) {
+			Assert::assertTrue(
+				$this->featureContext->isFieldInResponse($field, $value),
+				"$field doesn't have value '$value'"
+			);
 		}
 	}
 
