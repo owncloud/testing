@@ -1,7 +1,7 @@
-@api
+@api @skipOnOcV10.6 @skipOnOcV10.7
 Feature: expire a share
 
-  Scenario:
+  Scenario: set a share to expire yesterday and verify that it is not accessible
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
