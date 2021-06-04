@@ -37,6 +37,7 @@ use OCP\API;
 use OCA\Testing\TestingSkeletonDirectory;
 use OCA\Testing\TrustedServersHandler;
 use OCA\Testing\FilesProperties;
+use OCA\Testing\ExpireShare;
 
 $config = new Config(
 	\OC::$server->getConfig(),
@@ -387,6 +388,19 @@ API::register(
 	'get',
 	'/apps/testing/api/v1/lastlogindate/{user}',
 	[$date, 'getLastLoginDate'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$expireShare = new ExpireShare(
+	\OC::$server->getRequest(),
+	\OC::$server->getShareManager()
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/expire-share/{share_id}',
+	[$expireShare, 'expireShare'],
 	'testing',
 	API::ADMIN_AUTH
 );
