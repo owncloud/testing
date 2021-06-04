@@ -952,49 +952,6 @@ class TestingAppContext implements Context {
 	}
 
 	/**
-	 * Expires last created share using the testing API
-	 *
-	 * @return void
-	 */
-	public function expireLastCreatedUserShare() {
-		$adminUser = $this->featureContext->getAdminUsername();
-		$share_id = $this->featureContext->getLastShareId();
-		$response = OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$adminUser,
-			$this->featureContext->getAdminPassword(),
-			'POST',
-			$this->getBaseUrl("/expire-share/{$share_id}"),
-			[],
-			$this->featureContext->getOcsApiVersion()
-		);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Given the administrator has expired the last created share using the testing API
-	 *
-	 * @return void
-	 */
-	public function theAdministratorHasExpiredTheLastCreatedShare() {
-		$this->expireLastCreatedUserShare();
-		Assert::assertSame(
-			200,
-			$this->featureContext->getResponse()->getStatusCode(),
-			"Request to expire last share failed."
-		);
-	}
-
-	/**
-	 * @When the administrator expires the last created share using the testing API
-	 *
-	 * @return void
-	 */
-	public function theAdministratorExpiresTheLastCreatedShare() {
-		$this->expireLastCreatedUserShare();
-	}
-
-	/**
 	 * @Then the fields of the last response should include
 	 *
 	 * @param TableNode $body
