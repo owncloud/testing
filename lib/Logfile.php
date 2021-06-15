@@ -72,7 +72,8 @@ class Logfile {
 	 */
 	private function getLogFilePath() {
 		$dataDir = \OC::$server->getConfig()->getSystemValue(
-			'datadirectory', \OC::$SERVERROOT . '/data'
+			'datadirectory',
+			\OC::$SERVERROOT . '/data'
 		);
 		return \rtrim($dataDir, '/') . '/owncloud.log';
 	}
@@ -92,7 +93,9 @@ class Logfile {
 	 * @license http://creativecommons.org/licenses/by/3.0/
 	 */
 	private function tailFile(
-		$filepath, $noOfLinesToRead = 1, $adaptive = true
+		$filepath,
+		$noOfLinesToRead = 1,
+		$adaptive = true
 	) {
 		$lines = $noOfLinesToRead; //set a counter
 		// Open file

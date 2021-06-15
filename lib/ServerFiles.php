@@ -87,10 +87,12 @@ class ServerFiles {
 		if (\file_exists($targetDir)) {
 			if (\is_dir($targetDir)) {
 				$di = new RecursiveDirectoryIterator(
-					$targetDir, FilesystemIterator::SKIP_DOTS
+					$targetDir,
+					FilesystemIterator::SKIP_DOTS
 				);
 				$ri = new RecursiveIteratorIterator(
-					$di, RecursiveIteratorIterator::CHILD_FIRST
+					$di,
+					RecursiveIteratorIterator::CHILD_FIRST
 				);
 				foreach ($ri as $file) {
 					if ($file->isDir()) {
@@ -98,14 +100,16 @@ class ServerFiles {
 							return new Result(
 								null,
 								400,
-								"failed to delete sub-directory $file while deleting $targetDir");
+								"failed to delete sub-directory $file while deleting $targetDir"
+							);
 						}
 					} else {
 						if (!\unlink($file)) {
 							return new Result(
 								null,
 								400,
-								"failed to delete file $file while deleting $targetDir");
+								"failed to delete file $file while deleting $targetDir"
+							);
 						}
 					}
 				}
@@ -113,7 +117,8 @@ class ServerFiles {
 					return new Result(
 						null,
 						400,
-						"failed to delete directory $targetDir");
+						"failed to delete directory $targetDir"
+					);
 				}
 			} else {
 				return new Result(null, 400, "$dir is not a directory");
@@ -217,10 +222,12 @@ class ServerFiles {
 		if (\file_exists($targetDir)) {
 			if (\is_dir($targetDir)) {
 				$di = new RecursiveDirectoryIterator(
-					$targetDir, FilesystemIterator::SKIP_DOTS
+					$targetDir,
+					FilesystemIterator::SKIP_DOTS
 				);
 				$ri = new RecursiveIteratorIterator(
-					$di, RecursiveIteratorIterator::CHILD_FIRST
+					$di,
+					RecursiveIteratorIterator::CHILD_FIRST
 				);
 				foreach ($ri as $file) {
 					if ($file->isFile()) {

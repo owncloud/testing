@@ -31,7 +31,7 @@ use Sabre\HTTP\ResponseInterface;
  * Sabre plugin for the the file firewall:
  */
 class SlowdownPlugin extends ServerPlugin {
-	const NS_OWNCLOUD = 'http://owncloud.org/ns';
+	public const NS_OWNCLOUD = 'http://owncloud.org/ns';
 
 	/**
 	 * @var Server $server
@@ -79,7 +79,8 @@ class SlowdownPlugin extends ServerPlugin {
 	 * @return void
 	 */
 	public function sleep(
-		RequestInterface $request, ResponseInterface $response
+		RequestInterface $request,
+		ResponseInterface $response
 	) {
 		$timeToSleep = $this->slowDownSettings[\strtoupper($request->getMethod())];
 		$this->logger->info("time to sleep $timeToSleep");

@@ -46,7 +46,8 @@ class LastLoginDate {
 	 * @return void
 	 */
 	public function __construct(
-		AccountMapper $accountMapper, IRequest $request
+		AccountMapper $accountMapper,
+		IRequest $request
 	) {
 		$this->accountMapper = $accountMapper;
 		$this->request = $request;

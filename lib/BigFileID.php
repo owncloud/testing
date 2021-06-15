@@ -60,14 +60,16 @@ class BigFileID {
 			$this->connection->executeQuery($createSql);
 		}
 
-		$this->connection->insertIfNotExist('*PREFIX*filecache',
+		$this->connection->insertIfNotExist(
+			'*PREFIX*filecache',
 			[
 				'fileid' => 2147483647, 'storage' => 10000, 'path' => 'dummy',
 				'path_hash' => '59f91d3e7ebd97ade2e147d2066cc4eb', 'parent' => '5831',
 				'name' => '', 'mimetype' => 4, 'mimepart' => 3, 'size' => 163,
 				'mtime' => 1499256550, 'storage_mtime' => 1499256550, 'encrypted' => 0,
 				'unencrypted_size' => 0, 'etag' => '595cd6e63f375', 'permissions' => 27, 'checksum' => null],
-			['fileid']);
+			['fileid']
+		);
 
 		return new Result();
 	}

@@ -55,7 +55,8 @@ class Notifications extends \OCP\AppFramework\Controller {
 		$notification = $this->manager->createNotification();
 		$app = $this->request->getParam('app', 'notificationsacceptancetesting');
 		$date = \DateTime::createFromFormat(
-			'U', $this->request->getParam('timestamp', 1449585176)
+			'U',
+			$this->request->getParam('timestamp', 1449585176)
 		); // 2015-12-08T14:32:56+00:00
 		$user = $this->request->getParam('user', 'test1');
 		$subject = $this->request->getParam('subject', 'testing');

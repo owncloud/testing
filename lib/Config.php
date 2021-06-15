@@ -99,7 +99,8 @@ class Config {
 					$this->config->setAppValue(
 						$appEntry['appid'],
 						$appEntry['configkey'],
-						$appEntry['value']);
+						$appEntry['value']
+					);
 				}
 			}
 		}
