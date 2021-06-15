@@ -61,7 +61,9 @@ class FilesProperties {
 			$parameters[$parameterName] = $this->request->getParam($parameterName);
 			if ($parameters[$parameterName] === null) {
 				return new Result(
-					null, Http::STATUS_BAD_REQUEST, "parameter '$parameterName' is missing"
+					null,
+					Http::STATUS_BAD_REQUEST,
+					"parameter '$parameterName' is missing"
 				);
 			}
 		}
@@ -71,7 +73,9 @@ class FilesProperties {
 			$parameters['id'] = $this->request->getParam('id');
 			if ($parameters['id'] === null) {
 				return new Result(
-					null, Http::STATUS_BAD_REQUEST, "parameter id or path must be given"
+					null,
+					Http::STATUS_BAD_REQUEST,
+					"parameter id or path must be given"
 				);
 			}
 			$id = (int)$parameters['id'];

@@ -224,7 +224,8 @@ class Provisioning {
 				if (\strpos($lock, 'locking_') === 0) {
 					$path = \substr($lock, \strlen('locking_'));
 					$testingAppLock = (int) $this->config->getAppValue(
-						'testing', $lock
+						'testing',
+						$lock
 					);
 					if ($type === $testingAppLock || $type === 0) {
 						$lockingProvider->releaseLock($path, $testingAppLock);

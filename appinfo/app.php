@@ -26,7 +26,8 @@ $app = new Application();
 \OC::$server->getNotificationManager()->registerNotifier(
 	function () {
 		return new Notifier();
-	}, function () {
+	},
+	function () {
 		return [
 		'id' => 'testing',
 		'name' => 'testing',

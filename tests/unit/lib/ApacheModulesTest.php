@@ -34,7 +34,8 @@ class ApacheModulesTest extends TestCase {
 
 		$result = $this->apacheModule->getModule(["module" => "core"]);
 
-		$this->assertEquals($result->getMeta(),
+		$this->assertEquals(
+			$result->getMeta(),
 			[
 				"message" => "the server does not seem to be running behind Apache.",
 				"statuscode" => 998,
@@ -54,7 +55,8 @@ class ApacheModulesTest extends TestCase {
 
 		$result = $this->apacheModule->getModule(["module" => "core"]);
 
-		$this->assertEquals($result->getMeta(),
+		$this->assertEquals(
+			$result->getMeta(),
 			[
 				"message" => null,
 				"statuscode" => 100,
@@ -74,7 +76,8 @@ class ApacheModulesTest extends TestCase {
 
 		$result = $this->apacheModule->getModule(["module" => "core"]);
 
-		$this->assertEquals($result->getMeta(),
+		$this->assertEquals(
+			$result->getMeta(),
 			[
 				"message" => "core could not be found in apache_modules.",
 				"statuscode" => 998,

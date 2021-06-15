@@ -61,7 +61,9 @@ class CreateMultiUser extends Base {
 	 * @return void
 	 */
 	public function __construct(
-		IUserManager $userManager, IUserSession $session, ILogger $logger
+		IUserManager $userManager,
+		IUserSession $session,
+		ILogger $logger
 	) {
 		$this->userManager = $userManager;
 		$this->session = $session;
@@ -85,8 +87,10 @@ class CreateMultiUser extends Base {
 			->setName('testing:createusers')
 			->setDescription('Creates and provisions multiple users for testing')
 			->addOption(
-				'prefix', 'p',
-				InputOption::VALUE_REQUIRED, 'userid prefix for created users',
+				'prefix',
+				'p',
+				InputOption::VALUE_REQUIRED,
+				'userid prefix for created users',
 				$defaultUidPrefix
 			)
 			->addArgument('numUsers', InputArgument::REQUIRED);
@@ -103,7 +107,8 @@ class CreateMultiUser extends Base {
 	 * @return int 0 if everything went fine, or an error code
 	 */
 	protected function execute(
-		InputInterface $input, OutputInterface $output
+		InputInterface $input,
+		OutputInterface $output
 	) {
 		$numUsersArgument = $input->getArgument('numUsers');
 		if (\is_array($numUsersArgument)) {

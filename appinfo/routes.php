@@ -363,7 +363,8 @@ API::register(
 
 // files properties (working with the *properties table)
 $filesProperties = new FilesProperties(
-	\OC::$server->getDatabaseConnection(), \OC::$server->getRequest()
+	\OC::$server->getDatabaseConnection(),
+	\OC::$server->getRequest()
 );
 
 API::register(

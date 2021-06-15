@@ -709,7 +709,8 @@ class TestingAppContext implements Context {
 		);
 		$expectedExtensions = \explode(', ', $extensions);
 		Assert::assertEquals(
-			$expectedExtensions, $actualExtensions['element']
+			$expectedExtensions,
+			$actualExtensions['element']
 		);
 	}
 

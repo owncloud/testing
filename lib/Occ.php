@@ -34,7 +34,7 @@ class Occ {
 
 	// Variables defined in CI environments to pass automatically on
 	// to subshells when using remoteocc
-	const TESTING_ENV_VARS = [
+	public const TESTING_ENV_VARS = [
 		'CI',
 		'PATH',
 	];
@@ -86,7 +86,8 @@ class Occ {
 					return $arg;
 				}
 				return \escapeshellarg($arg);
-			}, $args
+			},
+			$args
 		);
 
 		$args = \implode(' ', $args);
