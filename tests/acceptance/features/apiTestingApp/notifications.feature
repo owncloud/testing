@@ -8,6 +8,7 @@ Feature: Test notifications feature of testing app
       | Alice    |
       | Brian    |
 
+  @skipOnOcV10.6 @skipOnOcV10.7
   Scenario Outline: Testing app can create notifications for user
     Given using OCS API version "<ocs-api-version>"
     When the administrator creates a notification with the following details using the testing API
@@ -20,12 +21,12 @@ Feature: Test notifications feature of testing app
       | object_id   | 47                         |
     Then user "Alice" should have 1 notifications
     And the last notification of user "Alice" should match these regular expressions about user "Alice"
-      | key         | regex                          |
-      | subject     | /^lorem_subject$/              |
-      | message     | /^lorem_message$/              |
-      | link        | /^www.lorem-notification.com$/ |
-      | object_type | /^local_share$/                |
-      | object_id   | /^47$/                         |
+      | key         | regex                                         |
+      | subject     | /^lorem_subject$/                             |
+      | message     | /^lorem_message$/                             |
+      | link        | /^https?:\/\/.+\/www.lorem-notification.com$/ |
+      | object_type | /^local_share$/                               |
+      | object_id   | /^47$/                                        |
     Examples:
       | ocs-api-version |
       | 1               |
