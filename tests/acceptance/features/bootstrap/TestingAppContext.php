@@ -92,6 +92,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/sysinfo"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -113,6 +114,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/logfile/{$number}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -134,6 +136,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/app/{$appId}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -157,6 +160,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/app/{$appID}/{$key}"),
+			$this->featureContext->getStepLineRef(),
 			["value" => $value],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -179,6 +183,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/app/{$appID}/{$key}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -234,6 +239,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/apps"),
+			$this->featureContext->getStepLineRef(),
 			['values' => $requestBody],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -259,6 +265,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/apps"),
+			$this->featureContext->getStepLineRef(),
 			['values' => $requestBody],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -364,6 +371,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/file"),
+			$this->featureContext->getStepLineRef(),
 			['file' => $path, 'content' => $content],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -404,6 +412,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/file"),
+			$this->featureContext->getStepLineRef(),
 			['file' => $path],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -425,6 +434,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/dir"),
+			$this->featureContext->getStepLineRef(),
 			['dir' => $dir],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -449,6 +459,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/dir"),
+			$this->featureContext->getStepLineRef(),
 			['dir' => $dir],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -468,6 +479,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/occ"),
+			$this->featureContext->getStepLineRef(),
 			['command' => $command],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -506,6 +518,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/occ/bulk"),
+			$this->featureContext->getStepLineRef(),
 			\json_encode($commandsBody),
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -548,6 +561,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/notifications"),
+			$this->featureContext->getStepLineRef(),
 			$body_array,
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -568,6 +582,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			'DELETE',
 			$this->getBaseUrl("/notifications"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -599,6 +614,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/increasefileid"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -619,6 +635,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			"/apps/testing/api/v1/getextension/$mimetype",
+			$this->featureContext->getStepLineRef(),
 			null,
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -652,6 +669,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/logfile"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -670,6 +688,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/logfile"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -722,10 +741,18 @@ class TestingAppContext implements Context {
 	 */
 	public function lockingIsEnabled() {
 		$lockStatus = \trim(
-			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig(
+				'filelocking.enabled',
+				$this->featureContext->getStepLineRef()
+			)["stdOut"]
 		);
 		if ($lockStatus !== 'true') {
-			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'true', 'boolean');
+			$res = SetupHelper::setSystemConfig(
+				'filelocking.enabled',
+				'true',
+				$this->featureContext->getStepLineRef(),
+				'boolean'
+			);
 			Assert::assertSame(
 				"System config value filelocking.enabled set to boolean true",
 				\trim($res['stdOut'])
@@ -741,10 +768,18 @@ class TestingAppContext implements Context {
 	 */
 	public function lockingIsDisabled() {
 		$lockStatus = \trim(
-			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig(
+				'filelocking.enabled',
+				$this->featureContext->getStepLineRef()
+			)["stdOut"]
 		);
 		if ($lockStatus !== 'true') {
-			$res = SetupHelper::setSystemConfig('filelocking.enabled', 'false', 'boolean');
+			$res = SetupHelper::setSystemConfig(
+				'filelocking.enabled',
+				'false',
+				$this->featureContext->getStepLineRef(),
+				'boolean'
+			);
 			Assert::assertSame(
 				"System config value filelocking.enabled set to boolean false",
 				\trim($res['stdOut'])
@@ -765,6 +800,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/lockprovisioning"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -788,6 +824,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'POST',
 			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}"),
+			$this->featureContext->getStepLineRef(),
 			['path' => $path],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -809,6 +846,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/lastlogindate/{$user}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -849,6 +887,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}?path={$path}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -872,6 +911,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/lockprovisioning/{$type}/{$user}"),
+			$this->featureContext->getStepLineRef(),
 			['path' => $path],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -893,6 +933,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/lockprovisioning/{$type}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -912,6 +953,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->getBaseUrl("/lockprovisioning"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -933,6 +975,7 @@ class TestingAppContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'GET',
 			$this->getBaseUrl("/apache_modules/{$module}"),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);
@@ -981,9 +1024,19 @@ class TestingAppContext implements Context {
 	 */
 	public function restoreLockStatus() {
 		if ($this->initialLockValue === 'true') {
-			SetupHelper::setSystemConfig('filelocking.enabled', 'true', 'boolean');
+			SetupHelper::setSystemConfig(
+				'filelocking.enabled',
+				'true',
+				$this->featureContext->getStepLineRef(),
+				'boolean'
+			);
 		} elseif ($this->initialLockValue === 'false') {
-			SetupHelper::setSystemConfig('filelocking.enabled', 'false', 'boolean');
+			SetupHelper::setSystemConfig(
+				'filelocking.enabled',
+				'false',
+				$this->featureContext->getStepLineRef(),
+				'boolean'
+			);
 		} else {
 			return;
 		}
@@ -1035,7 +1088,10 @@ class TestingAppContext implements Context {
 			$this->featureContext->getOcPath()
 		);
 		$this->initialLockValue = \trim(
-			SetupHelper::getSystemConfig('filelocking.enabled')["stdOut"]
+			SetupHelper::getSystemConfig(
+				'filelocking.enabled',
+				$this->featureContext->getStepLineRef()
+			)["stdOut"]
 		);
 	}
 }
