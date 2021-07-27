@@ -17,6 +17,7 @@ You can install the app via git in your app-folder
 ```
 cd apps
 git clone https://github.com/owncloud/testing.git
+cd ..
 php occ app:enable testing
 ```
 
