@@ -56,10 +56,11 @@ class Occ {
 	/**
 	 * @param string $command
 	 * @param Array $reqEnvVars
+	 * @param string $userInput
 	 *
 	 * @return Array
 	 */
-	public function runCommand($command, $reqEnvVars) {
+	public function runCommand($command, $reqEnvVars, $userInput) {
 		// Match the pieces of the string that are like:
 		//   Strings with single-quoted parts and there could be space(s) in the
 		//   single-quoted parts:
@@ -91,6 +92,12 @@ class Occ {
 		);
 
 		$args = \implode(' ', $args);
+
+		$input = '';
+		if($userInput !== '' && $userInput !== null) {
+			$input = "echo '$userInput' | ";
+		}
+
 		$descriptor = [
 			0 => ['pipe', 'r'],
 			1 => ['pipe', 'w'],
@@ -98,7 +105,7 @@ class Occ {
 		];
 
 		$process = \proc_open(
-			'php console.php ' . $args,
+			$input . 'php console.php ' . $args,
 			$descriptor,
 			$pipes,
 			\realpath("../"),
@@ -154,8 +161,9 @@ class Occ {
 	public function execute() {
 		$command = $this->request->getParam("command", "");
 		$reqEnvVars = $this->request->getParam("env_variables", []);
+		$userInput = $this->request->getParam("user_input", "");
 
-		$result = $this->runCommand($command, $reqEnvVars);
+		$result = $this->runCommand($command, $reqEnvVars, $userInput);
 		$resultCode = $result['code'] + 100;
 
 		return new Result($result, $resultCode);
