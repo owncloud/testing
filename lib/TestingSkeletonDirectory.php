@@ -35,7 +35,7 @@ class TestingSkeletonDirectory {
 	 * @var IRequest
 	 */
 	private $request;
-	
+
 	/**
 	 * @param IRequest $request
 	 */
@@ -58,12 +58,18 @@ class TestingSkeletonDirectory {
 	 * @return Result
 	 */
 	public function set() {
-		$folder = \trim($this->request->getParam('directory'), '/');
-		$folder = Filesystem::normalizePath($folder, true);
+		$directory = \trim($this->request->getParam('directory'), '/');
+		$folder = Filesystem::normalizePath($directory, true);
 		if (Filesystem::isValidPath($folder) === false) {
 			return new Result(null, 400, "invalid folder name");
 		}
-		$fullPath = \realpath(__DIR__ . "/../data/$folder");
+		$relativePath = __DIR__ . "/../data/$folder";
+		// We cannot have a really empty folder committed by git in the testing app.
+		// So create it on-the-fly if a test scenario wants an empty skeleton.
+		if (($directory === "emptySkeleton") && !\file_exists($relativePath)) {
+			\mkdir($relativePath);
+		}
+		$fullPath = \realpath($relativePath);
 		if ($fullPath === false || !\file_exists($fullPath)) {
 			return new Result(null, 404, "skeleton directory not found");
 		}
