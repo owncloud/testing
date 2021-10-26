@@ -75,7 +75,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return string
 	 */
-	public function getBaseUrl($path) {
+	public function getBaseUrl(string $path):string {
 		return "/apps/testing/api/v{$this->testingAppVersion}" . $path;
 	}
 
@@ -84,7 +84,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRequestsTheSystemInfoUsingTheTestingApi() {
+	public function theAdministratorRequestsTheSystemInfoUsingTheTestingApi():void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -106,7 +106,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRequestsTheLogfileWithLinesUsingTheTestingApi($number) {
+	public function theAdministratorRequestsTheLogfileWithLinesUsingTheTestingApi(int $number):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -128,7 +128,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRequestsTheDetailsAboutTheApp($appId) {
+	public function theAdministratorRequestsTheDetailsAboutTheApp(string $appId):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -152,7 +152,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorAddsAConfigKeyWithValueInAppUsingTheTestingApi($key, $value, $appID) {
+	public function theAdministratorAddsAConfigKeyWithValueInAppUsingTheTestingApi(
+		string $key,
+		string $value,
+		string $appID
+	):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -175,7 +179,10 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesTheConfigKeyInAppUsingTheTestingApi($key, $appID) {
+	public function theAdministratorDeletesTheConfigKeyInAppUsingTheTestingApi(
+		string $key,
+		string $appID
+	):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -197,7 +204,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theLastLoginDateForUserShouldBe($day) {
+	public function theLastLoginDateForUserShouldBe(int $day):void {
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$this->featureContext->getResponse()
 		);
@@ -212,12 +219,12 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theResponseShouldContainTheServerRoot() {
+	public function theResponseShouldContainTheServerRoot():void {
 		$responseXml = $this->featureContext->getResponseXml();
 		$data = \json_decode(\json_encode($responseXml->data[0]), 1);
 
-		Assert::assertInternalType('string', $data['server_root']);
-		Assert::assertRegExp('/[^\0]+/', $data['server_root']);
+		Assert::assertIsString($data['server_root']);
+		Assert::assertMatchesRegularExpression('/[^\0]+/', $data['server_root']);
 	}
 
 	/**
@@ -227,7 +234,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorAddsTheseConfigKeysUsingTheTestingApi(TableNode $table) {
+	public function theAdministratorAddsTheseConfigKeysUsingTheTestingApi(TableNode $table):void {
 		$requestBody = [];
 		foreach ($table as $item) {
 			\array_push($requestBody, $item);
@@ -253,7 +260,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesTheseConfigKeysUsingTheTestingApi(TableNode $table) {
+	public function theAdministratorDeletesTheseConfigKeysUsingTheTestingApi(TableNode $table):void {
 		$requestBody = [];
 		foreach ($table as $item) {
 			\array_push($requestBody, $item);
@@ -279,7 +286,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasAddedTheseConfigKeys(TableNode $table) {
+	public function theAdministratorHasAddedTheseConfigKeys(TableNode $table):void {
 		$this->theAdministratorAddsTheseConfigKeysUsingTheTestingApi($table);
 		Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
 	}
@@ -290,7 +297,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldContainTheInstalledVersionOfTheApp() {
+	public function theResponseShouldContainTheInstalledVersionOfTheApp():void {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 
 		foreach ($data as $element) {
@@ -322,7 +329,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theResponseShouldHaveTheNameOfTheApp($appID) {
+	public function theResponseShouldHaveTheNameOfTheApp(string $appID):void {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 		foreach ($data as $element) {
 			$responseAppName = $element['appid'];
@@ -336,7 +343,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldHaveTheAppEnabledStatusOfApp() {
+	public function theResponseShouldHaveTheAppEnabledStatusOfApp():void {
 		$data = $this->featureContext->parseConfigListFromResponseXml($this->featureContext->getResponseXml());
 		foreach ($data as $element) {
 			if ($element['configkey'] == 'enabled') {
@@ -363,7 +370,10 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesFileUsingTheTestingApi($path, $content) {
+	public function theAdministratorCreatesFileUsingTheTestingApi(
+		string $path,
+		string $content
+	):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -389,7 +399,10 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedFileWithContent($path, $content) {
+	public function theAdministratorHasCreatedFileWithContent(
+		string $path,
+		string $content
+	):void {
 		$this->theAdministratorCreatesFileUsingTheTestingApi($path, $content);
 		Assert::assertSame(
 			200,
@@ -404,7 +417,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesFileUsingTheTestingApi($path) {
+	public function theAdministratorDeletesFileUsingTheTestingApi(string $path):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -426,7 +439,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesDirectoryInServerRootUsingTheTestingApi($dir) {
+	public function theAdministratorCreatesDirectoryInServerRootUsingTheTestingApi(string $dir):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -451,7 +464,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesDirectoryUsingTheTestingApi($dir) {
+	public function theAdministratorDeletesDirectoryUsingTheTestingApi(string $dir):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -471,7 +484,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function runOccCommandUsingTestingAPI($command) {
+	public function runOccCommandUsingTestingAPI(string $command):void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -495,7 +508,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorRunsTheseOccCommandsUsingTheTestingApi(
 		TableNode $table
-	) {
+	):void {
 		foreach ($table as $item) {
 			$this->runOccCommandUsingTestingAPI($item['command']);
 		}
@@ -506,7 +519,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function runBulkOccCommandUsingTestingAPI($commands) {
+	public function runBulkOccCommandUsingTestingAPI(array $commands):void {
 		$user = $this->featureContext->getAdminUsername();
 		$commandsBody = [];
 		foreach ($commands as $command) {
@@ -534,7 +547,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theAdministratorRunsTheseOccCommandsInBulkUsingTheTestingApi(
 		TableNode $table
-	) {
+	):void {
 		$commands = [];
 		foreach ($table as $item) {
 			$commands[] = $item['command'];
@@ -549,7 +562,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesANotification(TableNode $table) {
+	public function theAdministratorCreatesANotification(TableNode $table):void {
 		$body_array = [];
 		foreach ($table as $item) {
 			$body_array[$item['key']] = $item['value'];
@@ -575,7 +588,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userDeletesAllNotificationsUsingTheTestingApi($user) {
+	public function userDeletesAllNotificationsUsingTheTestingApi(string $user):void {
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -596,7 +609,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedANotification(TableNode $table) {
+	public function theAdministratorHasCreatedANotification(TableNode $table):void {
 		$this->theAdministratorCreatesANotification($table);
 		Assert::assertSame(200, $this->featureContext->getResponse()->getStatusCode());
 	}
@@ -606,7 +619,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorIncreasesTheMaxFileIdSizeBeyond32BitsUsingTheTestingApi() {
+	public function theAdministratorIncreasesTheMaxFileIdSizeBeyond32BitsUsingTheTestingApi():void {
 		$user = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -628,7 +641,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorGetsAllTheExtensionsOfMimeTypeUsingTheTestingApi($mimetype) {
+	public function theAdministratorGetsAllTheExtensionsOfMimeTypeUsingTheTestingApi(string $mimetype):void {
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
@@ -651,7 +664,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function fileShouldHaveFileIdGreaterThanBitsForUser($path, $max, $user) {
+	public function fileShouldHaveFileIdGreaterThanBitsForUser(
+		string $path,
+		int $max,
+		string $user
+	):void {
 		$max_value = \bindec(\str_repeat("1", $max - 1));
 		$currentFileID = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertGreaterThan($max_value, (int)$currentFileID);
@@ -662,7 +679,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function getLogfile() {
+	public function getLogfile():void {
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
@@ -681,7 +698,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function clearLogFile() {
+	public function clearLogFile():void {
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
@@ -700,7 +717,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function logEntriesShouldDecreaseWhenTheAdministratorClearsTheLogfile() {
+	public function logEntriesShouldDecreaseWhenTheAdministratorClearsTheLogfile():void {
 		$this->getLogfile();
 		$initialCount = \count($this->featureContext->getResponseXml()->data[0]);
 		$this->clearLogFile();
@@ -716,7 +733,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theExtensionsReturnedShouldBe($extensions) {
+	public function theExtensionsReturnedShouldBe(string $extensions):void {
 		$responseXml = HttpRequestHelper::getResponseXml(
 			$this->featureContext->getResponse()
 		);
@@ -739,7 +756,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function lockingIsEnabled() {
+	public function lockingIsEnabled():void {
 		$lockStatus = \trim(
 			SetupHelper::getSystemConfig(
 				'filelocking.enabled',
@@ -766,7 +783,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function lockingIsDisabled() {
+	public function lockingIsDisabled():void {
 		$lockStatus = \trim(
 			SetupHelper::getSystemConfig(
 				'filelocking.enabled',
@@ -792,7 +809,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorChecksLockProvisioningStatusUsingTheTestingApi() {
+	public function theAdministratorChecksLockProvisioningStatusUsingTheTestingApi():void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -816,7 +833,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesLockForFileWithTypeForUser($path, $type, $user) {
+	public function theAdministratorCreatesLockForFileWithTypeForUser(
+		string $path,
+		string $type,
+		string $user
+	):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -838,7 +859,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorGetsTheLastLoginDateOfUserUsingTheTestingApi($user) {
+	public function theAdministratorGetsTheLastLoginDateOfUserUsingTheTestingApi(string $user):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -862,7 +883,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedLockForFileWithTypeForUser($path, $type, $user) {
+	public function theAdministratorHasCreatedLockForFileWithTypeForUser(
+		string $path,
+		string $type,
+		string $user
+	):void {
 		$this->theAdministratorCreatesLockForFileWithTypeForUser($path, $type, $user);
 		Assert::assertSame(
 			200,
@@ -879,7 +904,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorChecksLockForFileWithTypeForUser($path, $type, $user) {
+	public function theAdministratorChecksLockForFileWithTypeForUser(
+		string $path,
+		string $type,
+		string $user
+	):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -903,7 +932,11 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesLockFromFileWithTypeForUser($path, $type, $user) {
+	public function theAdministratorDeletesLockFromFileWithTypeForUser(
+		string $path,
+		string $type,
+		string $user
+	):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -925,7 +958,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorReleasesAllLocksOfType($type) {
+	public function theAdministratorReleasesAllLocksOfType(string $type):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -945,7 +978,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorReleasesAllLocks() {
+	public function theAdministratorReleasesAllLocks():void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -967,7 +1000,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorChecksIfApacheModIsInstalled($module) {
+	public function theAdministratorChecksIfApacheModIsInstalled(string $module):void {
 		$adminUser = $this->featureContext->getAdminUsername();
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
@@ -989,7 +1022,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedFollowingLocks(TableNode $table) {
+	public function theAdministratorHasCreatedFollowingLocks(TableNode $table):void {
 		foreach ($table as $item) {
 			$this->theAdministratorHasCreatedLockForFileWithTypeForUser($item['path'], $item['type'], $item['user']);
 		}
@@ -1003,7 +1036,7 @@ class TestingAppContext implements Context {
 	 * @throws Exception
 	 * @return void
 	 */
-	public function theFieldsOfTheLastResponseShouldInclude(TableNode $body) {
+	public function theFieldsOfTheLastResponseShouldInclude(TableNode $body):void {
 		$this->featureContext->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 		foreach ($bodyRows as $field => $value) {
@@ -1022,7 +1055,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function restoreLockStatus() {
+	public function restoreLockStatus():void {
 		if ($this->initialLockValue === 'true') {
 			SetupHelper::setSystemConfig(
 				'filelocking.enabled',
@@ -1049,7 +1082,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function deleteAllCreatedFiles() {
+	public function deleteAllCreatedFiles():void {
 		foreach ($this->createdFilePaths as $path) {
 			$this->theAdministratorDeletesFileUsingTheTestingApi($path);
 		}
@@ -1062,7 +1095,7 @@ class TestingAppContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function deleteAllCreatedDirectories() {
+	public function deleteAllCreatedDirectories():void {
 		foreach ($this->createdDirectoryPaths as $dir) {
 			$this->theAdministratorDeletesDirectoryUsingTheTestingApi($dir);
 		}
@@ -1076,7 +1109,7 @@ class TestingAppContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setUpScenario(BeforeScenarioScope $scope) {
+	public function setUpScenario(BeforeScenarioScope $scope):void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
