@@ -458,6 +458,32 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator moves directory/file :source to :target using the testing API
+	 *
+	 * @param string $source
+	 * @param string $target
+	 *
+	 * @return void
+	 */
+	public function theAdministratorMovesDirectoryToUsingTheTestingApi($source, $target) {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'MOVE',
+			$this->getBaseUrl("/file"),
+			$this->featureContext->getStepLineRef(),
+			['source' => $source, 'target' => $target],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+		if ($response->getStatusCode() === 200) {
+			\array_push($this->createdDirectoryPaths, $target);
+		}
+	}
+
+	/**
 	 * @When the administrator deletes directory :dir using the testing API
 	 *
 	 * @param string $dir
