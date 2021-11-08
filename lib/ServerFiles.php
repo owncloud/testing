@@ -238,4 +238,40 @@ class ServerFiles {
 		}
 		return new Result($result);
 	}
+
+	/**
+	 * Move a file to different location or name in the server
+	 * 'source' is a file or directory to rename
+	 * 'target' is a path to rename the file to
+	 * e.g. 'apps2/myapp/appinfo'
+	 *
+	 * @return Result
+	 */
+	public function moveFile() {
+		$filePath = \trim($this->request->getParam('source'), '/');
+		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		if ($isAbsolutePath === 'true') {
+			$filePath = "/$filePath";
+		} else {
+			$filePath = \OC::$SERVERROOT . "/$filePath";
+		}
+
+		$fileTarget = \trim($this->request->getParam('target'), '/');
+		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		if ($isAbsolutePath === 'true') {
+			$fileTarget = "/$fileTarget";
+		} else {
+			$fileTarget = \OC::$SERVERROOT . "/$fileTarget";
+		}
+
+		if (\file_exists($filePath)) {
+			try {
+				rename($filePath, $fileTarget);
+				return new Result([]);
+			} catch (\Exception $e) {
+				return new Result(null, 500, $e->getMessage());
+			}
+		}
+		return new Result(null, 404, "$fileTarget does not exist");
+	}
 }
