@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * ownCloud
  *
@@ -221,7 +221,7 @@ class TestingAppContext implements Context {
 	 */
 	public function theResponseShouldContainTheServerRoot():void {
 		$responseXml = $this->featureContext->getResponseXml();
-		$data = \json_decode(\json_encode($responseXml->data[0]), 1);
+		$data = \json_decode(\json_encode($responseXml->data[0]), true);
 
 		Assert::assertIsString($data['server_root']);
 		Assert::assertMatchesRegularExpression('/[^\0]+/', $data['server_root']);
