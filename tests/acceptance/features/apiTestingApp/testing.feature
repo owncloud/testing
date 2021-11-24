@@ -91,6 +91,25 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+  Scenario Outline: Admin adds and deletes a system config key of various types
+    Given using OCS API version "<ocs-api-version>"
+    When the administrator adds a system config key "testing42" with value "<value>" and type "<type>" using the testing API
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the system config key "testing42" should have value "<value>" with type "<type>"
+    When the administrator deletes the system config key "testing42" using the testing API
+    Then the HTTP status code should be "<http-status>"
+    And the HTTP reason phrase should be "<http-reason-phrase>"
+    And the OCS status code should be "<ocs-status>"
+    And the system config key "testing42" should have value "" with type "string"
+    Examples:
+      | value     | type    | ocs-api-version | ocs-status | http-status | http-reason-phrase |
+      | something | string  | 1               | 100        | 200         | OK                 |
+      | something | string  | 2               | 200        | 200         | OK                 |
+      | 987       | integer | 1               | 100        | 200         | OK                 |
+      | 987       | integer | 2               | 200        | 200         | OK                 |
+
   Scenario Outline: Testing app returns details about the app
     Given using OCS API version "<ocs-api-version>"
     Given app "comments" has been enabled
