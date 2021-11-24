@@ -198,6 +198,97 @@ class TestingAppContext implements Context {
 	}
 
 	/**
+	 * @When the administrator adds a system config key :key with value :value and type :type using the testing API
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param string $type the data type - string, int, bool, float
+	 *
+	 * @return void
+	 */
+	public function theAdministratorAddsASystemConfigKeyWithValueAndTypeUsingTheTestingApi(
+		string $key,
+		string $value,
+		string $type
+	):void {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'POST',
+			$this->getBaseUrl("/sysconfig/{$key}"),
+			$this->featureContext->getStepLineRef(),
+			["value" => $value, "type" => $type],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the administrator deletes the system config key :key using the testing API
+	 *
+	 * @param string $key
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheSystemConfigKeyUsingTheTestingApi(
+		string $key
+	):void {
+		$user = $this->featureContext->getAdminUsername();
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->getBaseUrl("/sysconfig/{$key}"),
+			$this->featureContext->getStepLineRef(),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the system config key :key should have value :value with type :type
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param string $type
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theSystemConfigKeyShouldHaveValueWithType(
+		string $key,
+		string $value,
+		string $type
+	):void {
+		$response = OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'GET',
+			"/apps/testing/api/v1/sysconfig/$key",
+			$this->featureContext->getStepLineRef(),
+			[],
+			$this->featureContext->getOcsApiVersion()
+		);
+		$configkeyValue = (string) $this->featureContext->getResponseXml($response, __METHOD__)->data[0]->element->value;
+		Assert::assertEquals(
+			$value,
+			$configkeyValue,
+			"The system config key $key was expected to have value $value but got $configkeyValue"
+		);
+		$configkeyType = (string) $this->featureContext->getResponseXml($response, __METHOD__)->data[0]->element->type;
+		Assert::assertEquals(
+			$type,
+			$configkeyType,
+			"The system config key $key was expected to have type $type but got $configkeyType"
+		);
+	}
+
+	/**
 	 * @Then the last login date in the response should be :day days ago
 	 *
 	 * @param int $day

@@ -32,6 +32,7 @@ use OCA\Testing\Notifications;
 use OCA\Testing\Occ;
 use OCA\Testing\Opcache;
 use OCA\Testing\ServerFiles;
+use OCA\Testing\SysConfig;
 use OCA\Testing\SysInfo;
 use OCP\API;
 use OCA\Testing\TestingSkeletonDirectory;
@@ -104,6 +105,35 @@ API::register(
 	'get',
 	'/apps/testing/api/v1/getextension/{type}/{subtype}',
 	[$config, 'getExtensionForMimeTypeSubType'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+$sysConfig = new SysConfig(
+	\OC::$server->getConfig(),
+	\OC::$server->getRequest()
+);
+
+API::register(
+	'post',
+	'/apps/testing/api/v1/sysconfig/{configkey}',
+	[$sysConfig, 'setSysConfigValue'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'delete',
+	'/apps/testing/api/v1/sysconfig/{configkey}',
+	[$sysConfig, 'deleteSysConfigValue'],
+	'testing',
+	API::ADMIN_AUTH
+);
+
+API::register(
+	'get',
+	'/apps/testing/api/v1/sysconfig/{configkey}',
+	[$sysConfig, 'getSysConfigValue'],
 	'testing',
 	API::ADMIN_AUTH
 );
