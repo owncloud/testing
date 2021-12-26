@@ -25,14 +25,11 @@ config = {
         "configureTarOnTag": True,
     },
     "javascript": False,
-    "phpunit": True
+    "phpunit": True,
     "acceptance": {
         "api": {
             "suites": [
                 "apiTestingApp",
-            ],
-            "phpVersions": [
-                "7.4",
             ],
         },
     },

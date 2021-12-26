@@ -32,23 +32,15 @@ use OCP\Share\IShare;
 
 class ExpireShare {
 
-	/**
-	 * @var IRequest
-	 */
-	private $request;
-
 	/** @var IManager */
 	private $shareManager;
 
 	/**
-	 * @param IRequest $request
 	 * @param IManager $shareManager
 	 */
 	public function __construct(
-		IRequest $request,
 		IManager $shareManager
 	) {
-		$this->request = $request;
 		$this->shareManager = $shareManager;
 	}
 
@@ -58,7 +50,6 @@ class ExpireShare {
 	 * @throws ShareNotFound
 	 */
 	private function getShareById($id) {
-		$share = null;
 		try {
 			$share = $this->shareManager->getShareById('ocinternal:'.$id);
 		} catch (ShareNotFound $e) {

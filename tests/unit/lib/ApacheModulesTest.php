@@ -22,7 +22,6 @@ class ApacheModulesTest extends TestCase {
 		parent::setUp();
 
 		$this->apacheModule = $this->getMockBuilder(ApacheModules::class)
-			->setConstructorArgs([new Request()])
 			->setMethods(['isApache', 'getModules'])
 			->getMock();
 	}

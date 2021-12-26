@@ -199,7 +199,7 @@ API::register(
 	API::ADMIN_AUTH
 );
 
-$apacheMod = new ApacheModules((\OC::$server->getRequest()));
+$apacheMod = new ApacheModules();
 
 API::register(
 	'get',
@@ -432,7 +432,6 @@ API::register(
 );
 
 $expireShare = new ExpireShare(
-	\OC::$server->getRequest(),
 	\OC::$server->getShareManager()
 );
 
