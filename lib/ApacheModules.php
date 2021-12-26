@@ -26,18 +26,7 @@ use OCP\API;
 use OCP\IRequest;
 
 class ApacheModules {
-	/**
-	 *
-	 * @var IRequest
-	 */
-	private $request;
-
-	/**
-	 *
-	 * @param IRequest $request
-	 */
-	public function __construct(IRequest $request) {
-		$this->request = $request;
+	public function __construct() {
 	}
 
 	protected function isApache() {
