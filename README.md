@@ -1,6 +1,8 @@
 # testing
 🔧 app for testing ownCloud
 
+Trigger CI
+
 [![Build Status](https://drone.owncloud.com/api/badges/owncloud/testing/status.svg?branch=master)](https://drone.owncloud.com/owncloud/testing)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=owncloud_testing&metric=alert_status)](https://sonarcloud.io/dashboard?id=owncloud_testing)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=owncloud_testing&metric=security_rating)](https://sonarcloud.io/dashboard?id=owncloud_testing)
