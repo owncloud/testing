@@ -79,7 +79,8 @@ class ExpireShare {
 		try {
 			$this->shareManager->updateShare($share, true);
 		} catch (GenericShareException $e) {
-			return new Result(null, 400, 'Share expire failed');
+			$exceptionMessage = $e->getMessage();
+			return new Result(null, 400, "Share expire failed: $exceptionMessage");
 		}
 		$date = new DateTime();
 
