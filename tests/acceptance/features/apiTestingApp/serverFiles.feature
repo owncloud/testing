@@ -1,6 +1,7 @@
 @api
 Feature: Test ServerFiles feature of testing app
 
+
   Scenario Outline: Testing app can create file in server root
     Given using OCS API version "<ocs-api-version>"
     When the administrator creates file "data/loremfile.txt" with content "lorem ipsum" using the testing API
@@ -9,6 +10,7 @@ Feature: Test ServerFiles feature of testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: Testing app can delete file in server root
     Given using OCS API version "<ocs-api-version>"
@@ -20,6 +22,7 @@ Feature: Test ServerFiles feature of testing app
       | 1               |
       | 2               |
 
+
   Scenario Outline: Testing app can create directory in server root
     Given using OCS API version "<ocs-api-version>"
     When the administrator creates directory "data/lorem-dir" in server root using the testing API
@@ -29,6 +32,7 @@ Feature: Test ServerFiles feature of testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: Testing app can delete directory in server root
     Given using OCS API version "<ocs-api-version>"
@@ -41,6 +45,7 @@ Feature: Test ServerFiles feature of testing app
       | 1               |
       | 2               |
 
+
   Scenario Outline: Testing app can move a directory in server root
     Given using OCS API version "<ocs-api-version>"
     When the administrator creates directory "data/lorem-dir" in server root using the testing API
@@ -52,6 +57,7 @@ Feature: Test ServerFiles feature of testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: Testing app can rename a file in server root
     Given using OCS API version "<ocs-api-version>"

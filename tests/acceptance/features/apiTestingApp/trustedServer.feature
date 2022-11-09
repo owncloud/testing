@@ -1,6 +1,7 @@
 @api @federation-app-required
 Feature: Test trusted server feature of testing app
 
+
   Scenario Outline: Add new trusted server using the testing api
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds url "http://new-oc.com" as trusted server using the testing API
@@ -12,6 +13,7 @@ Feature: Test trusted server feature of testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 201        | 201         | Created            |
       | 2               | 201        | 201         | Created            |
+
 
   Scenario Outline: Add already existing trusted server using the testing api
     Given using OCS API version "<ocs-api-version>"
@@ -25,6 +27,7 @@ Feature: Test trusted server feature of testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 200        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
 
   Scenario Outline: Add multiple trusted servers using the testing api
     Given using OCS API version "<ocs-api-version>"
@@ -41,6 +44,7 @@ Feature: Test trusted server feature of testing app
       | 1               |
       | 2               |
 
+
   Scenario Outline: Delete trusted servers using the testing api
     Given using OCS API version "<ocs-api-version>"
     And the administrator has added url "http://new-oc.com" as trusted server
@@ -51,6 +55,7 @@ Feature: Test trusted server feature of testing app
       | ocs-api-version | http-status |
       | 1               | 204         |
       | 2               | 204         |
+
 
   Scenario Outline: Delete all trusted servers using the testing api
     Given using OCS API version "<ocs-api-version>"

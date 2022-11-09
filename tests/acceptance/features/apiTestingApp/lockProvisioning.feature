@@ -1,6 +1,7 @@
 @api
 Feature: add and delete locks on files
 
+
   Scenario Outline: enable lock provisioning
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
@@ -13,6 +14,7 @@ Feature: add and delete locks on files
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: disable lock provisioning
     Given using OCS API version "<ocs-api-version>"
     And locking has been disabled
@@ -24,6 +26,7 @@ Feature: add and delete locks on files
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 501        | 200         | OK                 |
       | 2               | 501        | 501         | Not Implemented    |
+
 
   Scenario Outline: admin locks a file for a user
     Given using OCS API version "<ocs-api-version>"
@@ -39,6 +42,7 @@ Feature: add and delete locks on files
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: admin deletes lock from a file for a user
     Given using OCS API version "<ocs-api-version>"
     And locking has been enabled
@@ -53,6 +57,7 @@ Feature: add and delete locks on files
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 423        | 200         | OK                 |
       | 2               | 423        | 423         | Locked             |
+
 
   Scenario Outline: admin releases all locks of one type
     Given using OCS API version "<ocs-api-version>"
@@ -81,6 +86,7 @@ Feature: add and delete locks on files
       | ocs-api-version | ocs-status | http-status | http-reason-phrase | ocs-status-failure | http-status-failure | http-reason-phrase-failure |
       | 1               | 423        | 200         | OK                 | 100                | 200                 | OK                         |
       | 2               | 423        | 423         | Locked             | 200                | 200                 | OK                         |
+
 
   Scenario Outline: admin releases all locks
     Given using OCS API version "<ocs-api-version>"

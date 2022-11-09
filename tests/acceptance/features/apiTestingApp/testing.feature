@@ -1,6 +1,7 @@
 @api
 Feature: Testing the testing app
 
+
   Scenario Outline: Testing app returns the location of server
     Given using OCS API version "<ocs-api-version>"
     When the administrator requests the system-info using the testing API
@@ -12,6 +13,7 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
 
   Scenario Outline: Testing app returns the logfile with given number of lines
     Given using OCS API version "<ocs-api-version>"
@@ -25,6 +27,7 @@ Feature: Testing the testing app
       | 1               | 1           | 100        | 200         | OK                 |
       | 2               | 2           | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app can delete the logfile
     Given using OCS API version "<ocs-api-version>"
     Then log entries should decrease when the administrator clears the logfile
@@ -32,6 +35,7 @@ Feature: Testing the testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: Admin adds and deletes config key in a app
     Given using OCS API version "<ocs-api-version>"
@@ -51,6 +55,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Admin adds multiple config keys
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds these config keys using the testing API
@@ -68,6 +73,7 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
 
   Scenario Outline: Admin deletes multiple config keys
     Given using OCS API version "<ocs-api-version>"
@@ -91,6 +97,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Admin adds and deletes a system config key of various types
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds a system config key "testing42" with value "<value>" and type "<type>" using the testing API
@@ -110,6 +117,7 @@ Feature: Testing the testing app
       | 987       | integer | 1               | 100        | 200         | OK                 |
       | 987       | integer | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app returns details about the app
     Given using OCS API version "<ocs-api-version>"
     Given app "comments" has been enabled
@@ -125,6 +133,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app can change the max file id length
     Given using OCS API version "<ocs-api-version>"
     When the administrator increases the max file id size beyond 32 bits using the testing API
@@ -135,6 +144,7 @@ Feature: Testing the testing app
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: Testing app can run occ commands
     Given using OCS API version "<ocs-api-version>"
@@ -154,6 +164,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app can run occ commands in bulk
     Given using OCS API version "<ocs-api-version>"
     And app "comments" has been enabled
@@ -172,6 +183,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app returns all the extensions of a mime type
     Given using OCS API version "<ocs-api-version>"
     When the administrator gets all the extensions of mime-type "audio" using the testing API
@@ -183,6 +195,7 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
 
   Scenario Outline: Testing app returns all the extensions of a mime type with subtype
     Given using OCS API version "<ocs-api-version>"
@@ -196,6 +209,7 @@ Feature: Testing the testing app
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
 
+
   Scenario Outline: Testing app returns success if the given apache module is loaded
     Given using OCS API version "<ocs-api-version>"
     When the administrator checks if "core" apache module is installed using the testing API
@@ -206,6 +220,7 @@ Feature: Testing the testing app
       | ocs-api-version | ocs-status | http-status | http-reason-phrase |
       | 1               | 100        | 200         | OK                 |
       | 2               | 200        | 200         | OK                 |
+
 
   Scenario Outline: Testing app returns failure if the given apache module is not loaded
     Given using OCS API version "<ocs-api-version>"
