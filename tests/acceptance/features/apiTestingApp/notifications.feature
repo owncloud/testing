@@ -32,6 +32,7 @@ Feature: Test notifications feature of testing app
       | 1               |
       | 2               |
 
+
   Scenario Outline: Testing app can delete notifications
     Given using OCS API version "<ocs-api-version>"
     And the administrator has created a notification with the following details using the testing API
