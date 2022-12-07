@@ -40,9 +40,9 @@ return [
 		'appinfo',
 		'lib',
 		'vendor',
+		'../../apps/federation/lib',
 		'../../lib',
 		'../../core',
-		'../federation/lib'
 	],
 
 	// A directory list that defines files that will be excluded
@@ -58,9 +58,9 @@ return [
 	//       and `exclude_analysis_directory_list` arrays.
 	'exclude_analysis_directory_list' => [
 		'vendor',
+		'../../apps/federation/lib',
 		'../../lib',
 		'../../core',
-		'../federation/lib'
 	],
 
 	// A regular expression to match files to be excluded

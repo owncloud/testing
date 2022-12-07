@@ -82,6 +82,7 @@ class SlowdownPlugin extends ServerPlugin {
 		RequestInterface $request,
 		ResponseInterface $response
 	) {
+		/* @phan-suppress-next-line PhanTypeArraySuspiciousNullable */
 		$timeToSleep = $this->slowDownSettings[\strtoupper($request->getMethod())];
 		$this->logger->info("time to sleep $timeToSleep");
 		for ($i = 0; $i <= $timeToSleep; $i++) {

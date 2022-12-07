@@ -47,7 +47,14 @@ config = {
     ],
     "codestyle": True,
     "phpstan": True,
-    "phan": False,
+    "phan": {
+        "multipleVersions": {
+            "phpVersions": [
+                DEFAULT_PHP_VERSION,
+                "7.3",
+            ],
+        },
+    },
     "build": {
         "configureTarOnTag": True,
     },

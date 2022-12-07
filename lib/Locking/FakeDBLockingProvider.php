@@ -52,6 +52,7 @@ class FakeDBLockingProvider extends \OC\Lock\DBLockingProvider {
 	public function releaseLock($path, $type) {
 		// we DONT keep shared locks till the end of the request
 		if ($type === self::LOCK_SHARED) {
+			/* @phan-suppress-next-line PhanDeprecatedFunction */
 			$this->db->executeUpdate(
 				'UPDATE `*PREFIX*file_locks` SET `lock` = 0 WHERE `key` = ? AND `lock` = 1',
 				[$path]
@@ -66,6 +67,7 @@ class FakeDBLockingProvider extends \OC\Lock\DBLockingProvider {
 	 * @return void
 	 */
 	public function releaseAllGlobally() {
+		/* @phan-suppress-next-line PhanDeprecatedFunction */
 		$this->db->executeUpdate(
 			'UPDATE `*PREFIX*file_locks` SET `lock` = 0'
 		);
