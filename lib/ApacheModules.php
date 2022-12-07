@@ -23,7 +23,6 @@ namespace OCA\Testing;
 
 use OC\OCS\Result;
 use OCP\API;
-use OCP\IRequest;
 
 class ApacheModules {
 	public function __construct() {

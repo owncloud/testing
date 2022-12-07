@@ -138,6 +138,7 @@ class Occ {
 				$envVariables = [];
 			}
 
+			/* @phan-suppress-next-line PhanTypeMismatchArgument */
 			$result = $this->runCommand($item["command"], $envVariables);
 			\array_push($results, $result);
 			if ($result['code'] + 100 > $highCode) {

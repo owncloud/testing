@@ -24,7 +24,6 @@ namespace OCA\Testing;
 
 use DateTime;
 use OC\OCS\Result;
-use OCP\IRequest;
 use OCP\Share\Exceptions\GenericShareException;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager;
