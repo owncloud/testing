@@ -31,7 +31,6 @@ use OCP\ILogger;
  * Class for increasing file ids over 32 bits max int
  */
 class BigFileID {
-
 	/** @var IDBConnection */
 	private $connection;
 	/** @var ILogger */

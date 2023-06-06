@@ -31,7 +31,6 @@ use OCP\AppFramework\Http;
  *
  */
 class FilesProperties {
-
 	/** @var IDBConnection */
 	private $connection;
 

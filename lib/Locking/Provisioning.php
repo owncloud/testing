@@ -32,7 +32,6 @@ use OCP\Lock\ILockingProvider;
 use OCP\Lock\LockedException;
 
 class Provisioning {
-
 	/** @var ILockingProvider */
 	protected $lockingProvider;
 

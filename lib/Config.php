@@ -27,7 +27,6 @@ use OC\OCS\Result;
 use OC\Files\Type\Detection;
 
 class Config {
-
 	/** @var IConfig */
 	private $config;
 

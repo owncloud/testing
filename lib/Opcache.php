@@ -24,7 +24,6 @@ namespace OCA\Testing;
 use OC\OCS\Result;
 
 class Opcache {
-
 	/**
 	 *
 	 * @return Result

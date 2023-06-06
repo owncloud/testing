@@ -29,7 +29,6 @@ use OC\OCS\Result;
  *
  */
 class DavSlowdown {
-
 	/**
 	 * save the settings in a system setting
 	 *

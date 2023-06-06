@@ -30,7 +30,6 @@ use OCP\Share\IManager;
 use OCP\Share\IShare;
 
 class ExpireShare {
-
 	/** @var IManager */
 	private $shareManager;
 

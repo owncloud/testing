@@ -30,7 +30,6 @@ use OC\OCS\Result;
  * stored in config/config.php without having to use the occ config:system commands
  */
 class SysConfig {
-
 	/** @var IConfig */
 	private $config;
 
@@ -125,7 +124,7 @@ class SysConfig {
 						throw new \InvalidArgumentException('Unable to parse value as boolean');
 				}
 
-			// no break
+				// no break
 			case 'null':
 				return null;
 

@@ -29,7 +29,6 @@ use OC\OCS\Result;
  * logfile access class
  */
 class Logfile {
-
 	/**
 	 * reads and returns the raw content of the log file, one line per data element
 	 *
@@ -126,7 +125,6 @@ class Logfile {
 		
 		// While we would like more
 		while (\ftell($f) > 0 && $lines >= 0) {
-			
 			// Figure out how far back we should jump
 			$seek = \min(\ftell($f), $buffer);
 			

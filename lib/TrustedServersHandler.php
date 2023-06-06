@@ -30,7 +30,6 @@ use OC\OCS\Result;
  *
  */
 class TrustedServersHandler {
-
 	/**
 	 * @var IRequest
 	 */

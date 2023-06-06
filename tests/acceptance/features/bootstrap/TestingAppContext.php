@@ -36,7 +36,6 @@ require_once 'bootstrap.php';
  * Context for testing app
  */
 class TestingAppContext implements Context {
-
 	/**
 	 * @var FeatureContext
 	 */
