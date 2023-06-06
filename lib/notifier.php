@@ -29,7 +29,6 @@ use OCP\Notification\INotifier;
  *
  */
 class Notifier implements INotifier {
-
 	/**
 	 * @param INotification $notification
 	 * @param string $languageCode The code of the language that should be used to prepare the notification

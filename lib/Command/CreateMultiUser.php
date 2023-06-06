@@ -38,7 +38,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  */
 class CreateMultiUser extends Base {
-
 	/**
 	 * @var IUserManager
 	 */

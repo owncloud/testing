@@ -30,7 +30,6 @@ use OC\OCS\Result;
  * access system information
  */
 class SysInfo {
-
 	/**
 	 * gathers and returns internal system information
 	 *

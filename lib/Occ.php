@@ -31,7 +31,6 @@ use OCP\IRequest;
  *
  */
 class Occ {
-
 	// Variables defined in CI environments to pass automatically on
 	// to subshells when using remoteocc
 	public const TESTING_ENV_VARS = [
