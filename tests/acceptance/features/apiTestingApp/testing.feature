@@ -21,7 +21,7 @@ Feature: Testing the testing app
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"
     And the OCS status code should be "<ocs-status>"
-    Then the response should contain <line-number> entries
+    And the response should contain <line-number> entries
     Examples:
       | ocs-api-version | line-number | ocs-status | http-status | http-reason-phrase |
       | 1               | 1           | 100        | 200         | OK                 |
@@ -120,7 +120,7 @@ Feature: Testing the testing app
 
   Scenario Outline: Testing app returns details about the app
     Given using OCS API version "<ocs-api-version>"
-    Given app "comments" has been enabled
+    And app "comments" has been enabled
     When the administrator requests the details about the app "comments"
     Then the HTTP status code should be "<http-status>"
     And the HTTP reason phrase should be "<http-reason-phrase>"

@@ -32,8 +32,8 @@ Feature: Test trusted server feature of testing app
   Scenario Outline: Add multiple trusted servers using the testing api
     Given using OCS API version "<ocs-api-version>"
     When the administrator adds url "http://new-oc.com" as trusted server using the testing API
-    When the administrator adds url "http://new-oc1.com" as trusted server using the testing API
-    When the administrator adds url "http://aafnobadal.com" as trusted server using the testing API
+    And the administrator adds url "http://new-oc1.com" as trusted server using the testing API
+    And the administrator adds url "http://aafnobadal.com" as trusted server using the testing API
     Then the trusted server list should include these urls:
       | url                   |
       | http://new-oc.com     |
