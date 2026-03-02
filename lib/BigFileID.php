@@ -45,7 +45,7 @@ class BigFileID {
 	 * Put a dummy entry to make the autoincrement go beyond the 32 bits limit
 	 *
 	 * @return Result
-	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \Doctrine\DBAL\Exception
 	 */
 	public function increaseFileIDsBeyondMax32bits() {
 		$this->logger->warning('Inserting dummy entry with fileid bigger than max int of 32 bits for testing');

@@ -52,7 +52,7 @@ class FilesProperties {
 	 * if there is no property with that name for the file a new one will be created
 	 *
 	 * @return Result
-	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \Doctrine\DBAL\Exception
 	 */
 	public function upsertProperty() {
 		$parameters = [];
