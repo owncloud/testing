@@ -30,7 +30,7 @@ class BigFileIDTest extends TestCase {
 		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
 		$maxId = (int) $qb->select($qb->createFunction('MAX(`fileid`)'))
 			->from('filecache')
-			->execute()->fetchColumn();
+			->execute()->fetchOne();
 		self::assertEquals(2147483647, $maxId);
 	}
 }
