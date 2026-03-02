@@ -108,7 +108,7 @@ class CreateMultiUser extends Base {
 	protected function execute(
 		InputInterface $input,
 		OutputInterface $output
-	) {
+	): int {
 		$numUsersArgument = $input->getArgument('numUsers');
 		if (\is_array($numUsersArgument)) {
 			throw new \Exception("invalid argument");
