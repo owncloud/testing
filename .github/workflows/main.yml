@@ -54,3 +54,13 @@ jobs:
     with:
       app-name: ${{ needs.get-vars.outputs.app-name }}
       php-versions: ${{ needs.get-vars.outputs.php-versions }}
+
+  build:
+    name: Build
+    needs:
+      - get-vars
+      - php-code-style
+      - php-unit
+    uses: owncloud/reusable-workflows/.github/workflows/build.yml@main
+    with:
+      app-name: ${{ needs.get-vars.outputs.app-name }}

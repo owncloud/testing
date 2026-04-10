@@ -56,9 +56,7 @@ config = {
     "codestyle": False,
     "phpstan": False,
     "phan": False,
-    "build": {
-        "configureTarOnTag": True,
-    },
+    "build": False,
     "javascript": False,
     "phpunit": False,
     "acceptance": {
