@@ -100,6 +100,11 @@ test-acceptance-api: ## Run API acceptance tests
 test-acceptance-api: $(acceptance_test_deps)
 	BEHAT_BIN=$(BEHAT_BIN) ../../tests/acceptance/run.sh --remote --type api
 
+# Installs dependencies and does any build actions needed for the app to run in CI
+.PHONY: ci
+ci: vendor
+	@echo dependencies and build actions for CI are completed
+
 #
 # Dependency management
 #--------------------------------------
