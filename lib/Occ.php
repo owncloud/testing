@@ -72,6 +72,10 @@ class Occ {
 		//     user1
 		//     --password-from-env
 
+		// Explicitly set the locale to handle UTF-8 characters.
+		// This ensures that escapeshellarg will correctly process
+		// UTF-8 strings with various scripts or special European characters.
+		setlocale(LC_CTYPE, 'C.UTF-8');
 		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
 		\preg_match_all("/\S*?'[^']*?'|\S+/", $command, $matches);
 		$args = $matches[0];
