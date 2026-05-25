@@ -164,6 +164,11 @@ class Occ {
 	// Taken from https://github.com/symfony/process/blob/master/Process.php
 	private function getDefaultEnv() {
 		$env = [];
+		// Specify a default locale that supports UTF8 characters
+		// This allows any UTF8 characters in the command to be preserved.
+		// For example, group names in various scripts.
+		$env['LANG'] = 'C.UTF-8';
+		$env['LC_ALL'] = 'C.UTF-8';
 		foreach ($_SERVER as $k => $v) {
 			if (\is_string($v) && false !== $v = \getenv($k)) {
 				$env[$k] = $v;
