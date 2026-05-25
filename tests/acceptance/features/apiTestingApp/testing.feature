@@ -177,6 +177,24 @@ Feature: Testing the testing app
       | नेपाली      | Unicode group name                    |
 
 
+  Scenario: admin gets all the groups
+    Given group "0" has been created
+    And group "brand-new-group" has been created
+    And group "España" has been created
+    And group "España§àôœ€" has been created
+    And group "नेपाली" has been created
+    When the administrator gets the groups in JSON format using the occ command
+    Then the command should have been successful
+    And the groups returned by the occ command should be
+      | group           |
+      | España          |
+      | España§àôœ€     |
+      | नेपाली            |
+      | admin           |
+      | brand-new-group |
+      | 0               |
+
+
   Scenario Outline: Testing app can run occ commands in bulk
     Given using OCS API version "<ocs-api-version>"
     And app "comments" has been enabled
