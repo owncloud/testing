@@ -45,7 +45,7 @@ make test-php-phan          # Run Phan static analysis
 
 - **AGPL-3.0 copyleft license:** This repository is AGPL-3.0. The OSPO Apache 2.0 migration requires auditing this copyleft license before any relicensing.
 - **Not for production:** This app should only be enabled on test/CI instances.
-- **ownCloud Server dependency:** Requires an ownCloud Server (OC10) installation to function.
+- **ownCloud Server dependency:** Requires an ownCloud Server (classic, PHP-based) installation to function.
 - **CI integration:** Used by GitHub Actions and Drone CI pipelines for acceptance testing.
 
 
