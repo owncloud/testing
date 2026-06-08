@@ -97,7 +97,7 @@ class Occ {
 		];
 
 		$process = \proc_open(
-			'php console.php ' . $args,
+			'LANG=C.UTF-8 php console.php ' . $args,
 			$descriptor,
 			$pipes,
 			\realpath("../"),
