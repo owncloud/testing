@@ -71,7 +71,7 @@ class Occ {
 		//     user:add
 		//     user1
 		//     --password-from-env
-
+		setlocale(LC_CTYPE, 'C.UTF-8');
 		$envVars = \array_merge($this->getDefaultEnv(), $reqEnvVars);
 		\preg_match_all("/\S*?'[^']*?'|\S+/", $command, $matches);
 		$args = $matches[0];
