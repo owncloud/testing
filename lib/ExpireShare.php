@@ -60,6 +60,9 @@ class ExpireShare {
 	}
 
 	public function expireShare(array $param) {
+		if (!\array_key_exists('share_id', $param)) {
+			return new Result(null, 400, 'Share Id not provided');
+		}
 		$id = \trim($param["share_id"]);
 		if (!$this->shareManager->shareApiEnabled()) {
 			return new Result(null, 404, 'Share API is disabled');

@@ -55,7 +55,10 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function mkDir() {
-		$dir = \trim($this->request->getParam('dir'), '/');
+		$dir = \trim($this->request->getParam('dir', ''), '/');
+		if ($dir === "") {
+			return new Result(null, 400, "cannot create dir, dir not specified");
+		}
 		$targetDir = \OC::$SERVERROOT . "/$dir";
 		if (!\file_exists($targetDir)) {
 			// Ask for the full mode, it will be masked by the current umask anyway
@@ -79,7 +82,7 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function rmDir() {
-		$dir = \trim($this->request->getParam('dir'), '/');
+		$dir = \trim($this->request->getParam('dir', ''), '/');
 		if ($dir === "") {
 			return new Result(null, 400, "cannot delete dir, no dir name given");
 		}
@@ -139,8 +142,11 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function readFile() {
-		$filePath = \trim($this->request->getParam('file'), '/');
-		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		$filePath = \trim($this->request->getParam('file', ''), '/');
+		if ($filePath === "") {
+			return new Result(null, 400, "cannot read file, file path not specified");
+		}
+		$isAbsolutePath = \trim($this->request->getParam('absolute', ''));
 		if ($isAbsolutePath === 'true') {
 			$targetFile = "/$filePath";
 		} else {
@@ -166,7 +172,10 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function createFile() {
-		$filePath = \trim($this->request->getParam('file'), '/');
+		$filePath = \trim($this->request->getParam('file', ''), '/');
+		if ($filePath === '') {
+			return new Result(null, 400, "cannot create file, file path not specified");
+		}
 		$content = $this->request->getParam('content');
 		$targetFile = \OC::$SERVERROOT . "/$filePath";
 		$result = \file_put_contents($targetFile, $content);
@@ -185,7 +194,7 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function deleteFile() {
-		$filePath = \trim($this->request->getParam('file'), '/');
+		$filePath = \trim($this->request->getParam('file', ''), '/');
 		if ($filePath === "") {
 			return new Result(null, 400, "cannot delete file, no file name given");
 		}
@@ -214,7 +223,7 @@ class ServerFiles {
 	 */
 	public function listFiles() {
 		$result = [];
-		$dir = \trim($this->request->getParam('dir'), '/');
+		$dir = \trim($this->request->getParam('dir', ''), '/');
 		if ($dir === "") {
 			return new Result(null, 400, "cannot list files in dir, no dir name given");
 		}
@@ -248,16 +257,22 @@ class ServerFiles {
 	 * @return Result
 	 */
 	public function moveFile() {
-		$filePath = \trim($this->request->getParam('source'), '/');
-		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		$filePath = \trim($this->request->getParam('source', ''), '/');
+		if ($filePath === "") {
+			return new Result(null, 400, "cannot move file, file path not specified");
+		}
+		$isAbsolutePath = \trim($this->request->getParam('absolute', ''));
 		if ($isAbsolutePath === 'true') {
 			$filePath = "/$filePath";
 		} else {
 			$filePath = \OC::$SERVERROOT . "/$filePath";
 		}
 
-		$fileTarget = \trim($this->request->getParam('target'), '/');
-		$isAbsolutePath = \trim($this->request->getParam('absolute'));
+		$fileTarget = \trim($this->request->getParam('target', ''), '/');
+		if ($fileTarget === "") {
+			return new Result(null, 400, "cannot move file, file target not specified");
+		}
+		$isAbsolutePath = \trim($this->request->getParam('absolute', ''));
 		if ($isAbsolutePath === 'true') {
 			$fileTarget = "/$fileTarget";
 		} else {

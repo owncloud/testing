@@ -61,6 +61,9 @@ class LastLoginDate {
 	 * @return Result
 	 */
 	public function setLastLoginDate($param) {
+		if (!\array_key_exists('user', $param)) {
+			return new Result(null, 400, 'User id not provided');
+		}
 		$user = \trim($param['user']);
 		try {
 			$account = $this->accountMapper->getByUid($user);
@@ -88,6 +91,9 @@ class LastLoginDate {
 	 * @return Result
 	 */
 	public function getLastLoginDate($param) {
+		if (!\array_key_exists('user', $param)) {
+			return new Result(null, 400, 'User id not provided');
+		}
 		$user = \trim($param['user']);
 		try {
 			$account = $this->accountMapper->getByUid($user);
