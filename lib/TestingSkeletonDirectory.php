@@ -58,7 +58,10 @@ class TestingSkeletonDirectory {
 	 * @return Result
 	 */
 	public function set() {
-		$directory = \trim($this->request->getParam('directory'), '/');
+		$directory = \trim($this->request->getParam('directory', ''), '/');
+		if ($directory === '') {
+			return new Result(null, 400, "cannot set skeleton directory, dir not specified");
+		}
 		$folder = Filesystem::normalizePath($directory, true);
 		if (Filesystem::isValidPath($folder) === false) {
 			return new Result(null, 400, "invalid folder name");
